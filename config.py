@@ -36,12 +36,27 @@ PORTFOLIO = {
     "SUI-USD": {
         "name": "Sui",
         "category": "crypto",
-        "notes": "Layer 1 blockchain",
+        "notes": "Emerging blockchain infrastructure — SuiPlay device launch H2 2026 catalyst",
     },
     "XRP-USD": {
         "name": "XRP",
         "category": "crypto",
-        "notes": "Cross-border payments",
+        "notes": "Payment and settlement rails — CLARITY Act April 2026 regulatory catalyst",
+    },
+    "BTC-USD": {
+        "name": "Bitcoin",
+        "category": "crypto",
+        "notes": "Store of value — most established digital asset, now held by institutional investors and central banks",
+    },
+    "ETH-USD": {
+        "name": "Ethereum",
+        "category": "crypto",
+        "notes": "Blockchain infrastructure platform — BlackRock tokenised fund runs on Ethereum",
+    },
+    "SOL-USD": {
+        "name": "Solana",
+        "category": "crypto",
+        "notes": "Next gen blockchain infrastructure — faster cheaper alternative to Ethereum, ETF applications pending",
     },
 }
 
@@ -98,9 +113,31 @@ WATCHLIST = {
         "name": "iShares Digital Security UCITS ETF",
         "theme": "cybersecurity",
         "notes": "Cybersecurity — protecting the digital world from AI-powered fraud and data breaches. "
-                 "Market growing from $248 billion in 2026 to $700 billion by 2034. Every AI data centre, "
-                 "every smart grid, every digital transaction needs protection. This is the digital security "
-                 "layer on top of all the physical infrastructure themes.",
+                 "Market growing from $248 billion in 2026 to $700 billion by 2034.",
+    },
+    "BTEC.L": {
+        "name": "iShares Nasdaq US Biotech UCITS ETF",
+        "theme": "biotech",
+        "notes": "Biotech — medicine being reinvented by AI and genetics. Over 200 blockbuster drugs "
+                 "losing patent protection. Big pharma buying small biotech firms to replace lost revenue.",
+    },
+    "RBOT.L": {
+        "name": "iShares Automation & Robotics UCITS ETF",
+        "theme": "robotics",
+        "notes": "Robotics — physical AI arriving in the real world. Tesla, XPeng racing to mass produce "
+                 "humanoid robots. Companies making motors, sensors and AI chips inside robots are the hidden play.",
+    },
+    "IGLN.L": {
+        "name": "iShares Physical Gold ETC",
+        "theme": "gold",
+        "notes": "Gold — central banks bought more in 2024 than any year since 1967. "
+                 "Diversifying away from US dollars. Protects portfolio when things go wrong.",
+    },
+    "BLOK.L": {
+        "name": "iShares Blockchain Technology UCITS ETF",
+        "theme": "blockchain",
+        "notes": "Tokenisation infrastructure — BlackRock CEO called tokenisation the key to democratising "
+                 "investing. Holds companies building the technology, not the cryptocurrencies themselves.",
     },
 }
 
@@ -161,9 +198,37 @@ THRESHOLDS = {
     "lock_drawdown": {
         "ticker": "LOCK.L",
         "condition": "below",
-        "value": None,  # Set dynamically as 85% of current price (15% drawdown)
+        "value": None,
         "pct_drop": 15,
         "signal": "Cybersecurity ETF 15% drawdown — potential entry signal",
+    },
+    "btec_drawdown": {
+        "ticker": "BTEC.L",
+        "condition": "below",
+        "value": None,
+        "pct_drop": 20,
+        "signal": "Biotech ETF 20% drawdown — potential entry signal",
+    },
+    "rbot_drawdown": {
+        "ticker": "RBOT.L",
+        "condition": "below",
+        "value": None,
+        "pct_drop": 15,
+        "signal": "Robotics ETF 15% drawdown — potential entry signal",
+    },
+    "igln_drawdown": {
+        "ticker": "IGLN.L",
+        "condition": "below",
+        "value": None,
+        "pct_drop": 10,
+        "signal": "Gold 10% drawdown — accumulation opportunity",
+    },
+    "blok_drawdown": {
+        "ticker": "BLOK.L",
+        "condition": "below",
+        "value": None,
+        "pct_drop": 15,
+        "signal": "Blockchain ETF 15% drawdown — accumulation opportunity",
     },
 }
 

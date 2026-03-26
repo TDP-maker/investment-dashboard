@@ -75,11 +75,35 @@ def explain_portfolio(item: dict) -> str:
 
     if "XRP" in ticker:
         if signal == "GREEN":
-            return "XRP is stable. No news is good news here."
+            return "XRP is stable. CLARITY Act in April 2026 could be the catalyst for institutional adoption."
         elif signal == "AMBER":
-            return f"XRP is wobbling a bit ({weekly:+.1f}% this week). Typical crypto volatility."
+            return f"XRP is wobbling a bit ({weekly:+.1f}% this week). Watch for CLARITY Act news — that's the key event."
         else:
-            return f"XRP took a hit ({pct_from_high:+.0f}% from highs). Sit tight — these cycles take time."
+            return f"XRP took a hit ({pct_from_high:+.0f}% from highs). Sit tight — regulatory clarity could change everything."
+
+    if "BTC" in ticker:
+        if signal == "GREEN":
+            return "Bitcoin is holding strong. The most established digital asset — institutional adoption continues."
+        elif signal == "AMBER":
+            return f"Bitcoin pulled back {abs(weekly):.1f}% this week. Normal volatility for crypto — the long-term thesis is unchanged."
+        else:
+            return f"Bitcoin has dropped significantly ({pct_from_high:+.0f}% from highs). Historically, deep drawdowns have been buying opportunities."
+
+    if "ETH" in ticker:
+        if signal == "GREEN":
+            return "Ethereum is solid. BlackRock's tokenised fund runs on it — this IS the tokenisation infrastructure."
+        elif signal == "AMBER":
+            return f"Ethereum dipped {abs(weekly):.1f}% this week. The tokenisation thesis doesn't change with weekly price moves."
+        else:
+            return f"Ethereum is down hard ({pct_from_high:+.0f}% from highs). If tokenisation is real, this is the infrastructure it runs on."
+
+    if "SOL" in ticker:
+        if signal == "GREEN":
+            return "Solana is cruising. Faster and cheaper than Ethereum — ETF applications pending could drive institutional inflows."
+        elif signal == "AMBER":
+            return f"Solana pulled back {abs(weekly):.1f}% this week. Next-gen blockchain — volatile but growing fast."
+        else:
+            return f"Solana has dropped ({pct_from_high:+.0f}% from highs). High beta crypto — patience required."
 
     # Fallback
     if signal == "GREEN":
@@ -139,6 +163,26 @@ def explain_watchlist(item: dict) -> str:
             "GREEN": "Cybersecurity stocks are strong. Every new data centre and smart grid needs protection, and spending keeps rising.",
             "AMBER": f"Cybersecurity dipped {abs(weekly):.1f}% this week. The threat landscape only grows — dips tend to be temporary.",
             "RED": "Cybersecurity stocks are under pressure. The $700 billion market by 2034 thesis hasn't changed — could be an opportunity.",
+        },
+        "biotech": {
+            "GREEN": "Biotech is running. Big pharma M&A is driving prices higher as they replace expiring drug patents.",
+            "AMBER": f"Biotech pulled back {abs(weekly):.1f}% this week. Normal in this volatile sector — the M&A thesis is intact.",
+            "RED": "Biotech is in a correction. If you believe in the patent cliff thesis, these prices get very interesting.",
+        },
+        "robotics": {
+            "GREEN": "Robotics stocks are strong. Humanoid robot production is accelerating — still very early innings.",
+            "AMBER": f"Robotics dipped {abs(weekly):.1f}% this week. Early-stage theme so expect big swings — the trend is still up.",
+            "RED": "Robotics sold off hard. Physical AI is still coming — this could be a rare early entry point.",
+        },
+        "gold": {
+            "GREEN": "Gold is holding strong. Central banks are still buying at record pace — the diversification trend continues.",
+            "AMBER": f"Gold pulled back {abs(weekly):.1f}% this week. After a massive run, some cooling is healthy.",
+            "RED": "Gold has dropped significantly. Central bank buying hasn't stopped — could be an accumulation window.",
+        },
+        "blockchain": {
+            "GREEN": "Blockchain infrastructure stocks are strong. Tokenisation is gaining institutional momentum.",
+            "AMBER": f"Blockchain stocks dipped {abs(weekly):.1f}% this week. The technology adoption is still early — volatile but trending.",
+            "RED": "Blockchain infrastructure sold off. If you believe in the tokenisation thesis, this is where positions get built.",
         },
     }
 
@@ -736,6 +780,101 @@ PROJECTIONS = {
             "Northrop Grumman. When governments commit to higher spending, these companies get the contracts."
         ),
     },
+    "biotech": {
+        "title": "Biotech \u2014 The Quiet Outperformer",
+        "color": "#7f7f7f",
+        "chart_type": "supply_demand",
+        "data": {
+            "Biotech M&A Deal Value ($bn)":      [50, 60, 72, 85, 100, 115, 130, 140, 150, 150, 150, 150, 150, 150, 150, 150],
+            "Patent Cliff Revenue at Risk ($bn)": [30, 45, 60, 80, 100, 120, 140, 155, 170, 180, 190, 195, 200, 200, 200, 200],
+        },
+        "y_prefix": "$",
+        "y_label": "Billions per year",
+        "source": "Source: AlphaSense Biotech M&A Report 2025 | Morgan Stanley Healthcare Research 2025",
+        "summary": (
+            "Big pharma companies are running out of blockbuster drugs. Their solution \u2014 buy small biotech firms "
+            "that have already done the hard work of developing new ones. Every acquisition is paid at a premium to "
+            "current market price. You do not need to pick which drug wins. You just need to own the basket of "
+            "companies they are buying."
+        ),
+        "why_matters": (
+            "BTEC (iShares Nasdaq US Biotech UCITS ETF) holds the companies that big pharma is racing to acquire. "
+            "The ETF returned 33% in H2 2025 \u2014 most retail investors missed it entirely."
+        ),
+    },
+    "robotics": {
+        "title": "Robotics \u2014 Physical AI Coming to the Real World",
+        "color": "#17a2b8",
+        "chart_type": "scenarios",
+        "data": {
+            "Humanoid Robot Market ($bn)":     [2, 3, 4.5, 6.5, 9, 12, 16, 20, 25, 30, 38, 38, 38, 38, 38, 38],
+            "Industrial Robotics Market ($bn)": [50, 55, 60, 66, 73, 80, 88, 97, 107, 118, 130, 143, 157, 173, 190, 210],
+        },
+        "y_prefix": "$",
+        "y_label": "Market size ($ billions)",
+        "source": "Source: Morgan Stanley Humanoid Robotics Report 2025 | IFR World Robotics Report 2024",
+        "summary": (
+            "Humanoid robots are where smartphones were in 2007. The first iPhone looked clunky and expensive. "
+            "Three years later everyone had one. Humanoid robots are clunky and expensive in 2026. But Tesla, "
+            "XPeng and a dozen other companies are racing to mass produce them. The companies making the motors, "
+            "sensors and AI chips inside the robots are the hidden play \u2014 exactly like companies making "
+            "smartphone components were in 2007."
+        ),
+        "why_matters": (
+            "RBOT (iShares Automation & Robotics UCITS ETF) holds the companies building robot components \u2014 "
+            "the picks and shovels of the physical AI revolution."
+        ),
+    },
+    "gold": {
+        "title": "Gold \u2014 Central Banks Are Buying. Are You?",
+        "color": "#ffd700",
+        "chart_type": "scenarios",
+        "data": {
+            "Central Bank Gold Purchases (tonnes/yr)": [200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 1000],
+            "Gold Price Trajectory ($/oz, x10)":       [120, 160, 180, 195, 210, 225, 240, 255, 270, 285, 300, 320, 340, 360, 380, 400],
+        },
+        "y_prefix": "",
+        "y_label": "Tonnes per year / Price index",
+        "source": "Source: World Gold Council Central Bank Survey 2025 | World Gold Council Gold Demand Trends 2024",
+        "summary": (
+            "Central banks \u2014 the people responsible for managing entire countries' worth of money \u2014 bought "
+            "more gold in 2024 than in any year since 1967. They are not doing this because gold is exciting. "
+            "They are doing it because they are quietly losing confidence in the US dollar as the world reserve "
+            "currency. When the smartest, most conservative investors on earth all make the same move quietly \u2014 "
+            "that is worth paying attention to."
+        ),
+        "why_matters": (
+            "IGLN (iShares Physical Gold ETC) gives you direct gold exposure. Gold doesn't generate income but "
+            "it protects everything else in your portfolio when things go wrong."
+        ),
+    },
+    "tokenisation": {
+        "title": "Tokenisation \u2014 The Next Internet",
+        "color": "#ff6347",
+        "chart_type": "scenarios",
+        "data": {
+            "RWA Tokenisation Market ($T)":           [0.022, 0.05, 0.12, 0.3, 0.8, 2.0, 4.0, 6.5, 9.0, 11.5, 13.5, 14.5, 15.2, 15.6, 15.8, 16.0],
+            "Traditional Securities Market ($T)":     [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
+        },
+        "y_prefix": "$",
+        "y_label": "Market size ($ trillions)",
+        "source": (
+            "Source: Boston Consulting Group Tokenisation Report 2024 | "
+            "BlackRock Annual Letter March 23 2026"
+        ),
+        "summary": (
+            "This is not crypto speculation. This is the technology that will allow ordinary people to own small "
+            "pieces of property, private equity and infrastructure that today only the wealthy can access. "
+            "Larry Fink \u2014 managing $14 trillion at BlackRock \u2014 called it the internet in 1996. "
+            "The people who invested in internet infrastructure in 1996 \u2014 not specific dotcom companies but "
+            "the actual infrastructure \u2014 made extraordinary returns over the following decade."
+        ),
+        "why_matters": (
+            "BLOK (iShares Blockchain Technology UCITS ETF) holds the companies building tokenisation "
+            "infrastructure. Your existing crypto holdings (BTC, ETH, SOL, SUI, XRP) are the other side "
+            "of this trade \u2014 you already own the rails."
+        ),
+    },
 }
 
 
@@ -988,27 +1127,34 @@ def render_historical_returns():
     st.subheader("Verified Historical Returns")
     st.caption("Actual average annual returns by ETF and time period.")
 
-    etfs = ["VWRA (VT)", "Water (PHO)", "Grid (GRID)", "Copper (COPX)", "Uranium (URA)", "Semis (SEMI)", "Cyber (LOCK)"]
+    etfs = ["VWRA (VT)", "Water (PHO)", "Grid (GRID)", "Copper (COPX)", "Uranium (URA)",
+            "Semis (SEMI)", "Cyber (LOCK)", "Biotech (BTEC)", "Robotics (RBOT)", "Gold (IGLN)"]
     periods = ["20yr", "15yr", "10yr", "5yr"]
 
     returns_data = {
-        "VWRA (VT)":     [9.0,  9.5,  11.0, 11.7],
-        "Water (PHO)":   [8.58, 9.73, 13.10, 9.76],
-        "Grid (GRID)":   [None, 12.0, 15.0, 16.0],
-        "Copper (COPX)": [None, 8.0,  10.0, 18.0],
-        "Uranium (URA)": [None, 5.0,  8.0,  22.0],
-        "Semis (SEMI)":  [None, None, 14.0, 25.0],
-        "Cyber (LOCK)":  [None, None, 13.0, 16.0],
+        "VWRA (VT)":       [9.0,  9.5,  11.0, 11.7],
+        "Water (PHO)":     [8.58, 9.73, 13.10, 9.76],
+        "Grid (GRID)":     [None, 12.0, 15.0, 16.0],
+        "Copper (COPX)":   [None, 8.0,  10.0, 18.0],
+        "Uranium (URA)":   [None, 5.0,  8.0,  22.0],
+        "Semis (SEMI)":    [None, None, 14.0, 25.0],
+        "Cyber (LOCK)":    [None, None, 13.0, 16.0],
+        "Biotech (BTEC)":  [None, None, 8.0,  15.0],
+        "Robotics (RBOT)": [None, None, 12.0, 14.0],
+        "Gold (IGLN)":     [None, None, 9.0,  14.0],
     }
 
     colors = {
-        "VWRA (VT)":     "#1f77b4",
-        "Water (PHO)":   "#17becf",
-        "Grid (GRID)":   "#ff7f0e",
-        "Copper (COPX)": "#d62728",
-        "Uranium (URA)": "#2ca02c",
-        "Semis (SEMI)":  "#e377c2",
-        "Cyber (LOCK)":  "#bcbd22",
+        "VWRA (VT)":       "#1f77b4",
+        "Water (PHO)":     "#17becf",
+        "Grid (GRID)":     "#ff7f0e",
+        "Copper (COPX)":   "#d62728",
+        "Uranium (URA)":   "#2ca02c",
+        "Semis (SEMI)":    "#e377c2",
+        "Cyber (LOCK)":    "#bcbd22",
+        "Biotech (BTEC)":  "#7f7f7f",
+        "Robotics (RBOT)": "#17a2b8",
+        "Gold (IGLN)":     "#ffd700",
     }
 
     hist_fig = go.Figure()
@@ -1047,21 +1193,26 @@ def render_historical_returns():
     st.caption("Based on institutional demand forecasts and committed government spending.")
 
     proj_themes = [
-        "VWRA", "Water", "Grid Infra", "Copper", "Uranium", "Semiconductors", "Cybersecurity"
+        "VWRA", "Water", "Grid Infra", "Copper", "Uranium", "Semis", "Cyber",
+        "Biotech", "Robotics", "Gold",
     ]
-    proj_low =  [9,  12, 15, 12, 14, 12, 14]
-    proj_high = [10, 15, 18, 16, 18, 16, 18]
+    proj_low =  [9,  12, 15, 12, 14, 12, 14, 15, 16, 8]
+    proj_high = [10, 15, 18, 16, 18, 16, 18, 20, 22, 12]
     proj_mid =  [(l + h) / 2 for l, h in zip(proj_low, proj_high)]
-    proj_colors = ["#1f77b4", "#17becf", "#ff7f0e", "#d62728", "#2ca02c", "#e377c2", "#bcbd22"]
+    proj_colors = ["#1f77b4", "#17becf", "#ff7f0e", "#d62728", "#2ca02c", "#e377c2", "#bcbd22",
+                   "#7f7f7f", "#17a2b8", "#ffd700"]
 
     proj_sources = [
-        "Vanguard Capital Markets Model",
-        "WEF / Morgan Stanley 2025",
-        "IEA 2025 / COP29 pledges",
-        "S&P Global / Goldman Sachs",
+        "Vanguard",
+        "WEF / Morgan Stanley",
+        "IEA 2025",
+        "S&P / Goldman",
         "WNA 2025",
-        "Bloomberg / McKinsey 2025",
-        "US DoD / EU NIS2 2024",
+        "Bloomberg / McKinsey",
+        "US DoD / EU NIS2",
+        "AlphaSense / Morgan Stanley",
+        "Morgan Stanley Robotics",
+        "World Gold Council",
     ]
 
     proj_fig = go.Figure()
@@ -1119,10 +1270,10 @@ def render_historical_returns():
     # ------------------------------------------------------------------
     st.subheader("Historical vs Projected — Side by Side Comparison")
 
-    sbs_themes = ["VWRA", "Water", "Grid Infra", "Copper", "Uranium", "Rare Earths", "Defence", "Semis", "Cyber"]
-    sbs_hist   = [11.0, 13.1, 15.0, 10.0, 8.0, 6.0, 12.0, 14.0, 13.0]
-    sbs_low    = [9,    12,   15,   12,   14,  10,  12,   12,   14]
-    sbs_high   = [10,   15,   18,   16,   18,  14,  15,   16,   18]
+    sbs_themes = ["VWRA", "Water", "Grid", "Copper", "Uranium", "Rare E.", "Defence", "Semis", "Cyber", "Biotech", "Robots", "Gold"]
+    sbs_hist   = [11.0, 13.1, 15.0, 10.0, 8.0, 6.0, 12.0, 14.0, 13.0, 8.0,  12.0, 9.0]
+    sbs_low    = [9,    12,   15,   12,   14,  10,  12,   12,   14,   15,   16,   8]
+    sbs_high   = [10,   15,   18,   16,   18,  14,  15,   16,   18,   20,   22,   12]
 
     sbs_fig = go.Figure()
 
@@ -1198,6 +1349,10 @@ def render_historical_returns():
         {"Theme": "Defence",             "10yr Hist Return": "12%",   "Projected to 2030": "12-15%", "Risk Level": "Medium",    "Key Demand Driver": "NATO 2% GDP commitment, EU ReArm \u20ac800bn",       "Position Size": "Small",     "UCITS Ticker (LSE)": "NATO"},
         {"Theme": "Semiconductors",      "10yr Hist Return": "14%",   "Projected to 2030": "12-16%", "Risk Level": "High",      "Key Demand Driver": "AI capex $300bn+ annually, chip monopolies",         "Position Size": "Small",     "UCITS Ticker (LSE)": "SEMI"},
         {"Theme": "Cybersecurity",       "10yr Hist Return": "13%",   "Projected to 2030": "14-18%", "Risk Level": "Medium",    "Key Demand Driver": "$248bn to $700bn market by 2034, AI-driven threats", "Position Size": "Small",     "UCITS Ticker (LSE)": "LOCK"},
+        {"Theme": "Biotech",             "10yr Hist Return": "8%",    "Projected to 2030": "15-20%", "Risk Level": "High",      "Key Demand Driver": "200+ drugs losing patents, big pharma M&A accelerating",  "Position Size": "Small",     "UCITS Ticker (LSE)": "BTEC"},
+        {"Theme": "Robotics",            "10yr Hist Return": "12%",   "Projected to 2030": "16-22%", "Risk Level": "High",      "Key Demand Driver": "Humanoid robots entering mass production 2026",            "Position Size": "Small",     "UCITS Ticker (LSE)": "RBOT"},
+        {"Theme": "Gold",                "10yr Hist Return": "9%",    "Projected to 2030": "8-12%",  "Risk Level": "Low-Med",   "Key Demand Driver": "Central banks buying at fastest pace since 1967",          "Position Size": "Satellite", "UCITS Ticker (LSE)": "IGLN"},
+        {"Theme": "Blockchain Infra",    "10yr Hist Return": "N/A",   "Projected to 2030": "20-30%", "Risk Level": "Very High", "Key Demand Driver": "RWA tokenisation $22bn to $16T by 2030 (BCG)",             "Position Size": "Small",     "UCITS Ticker (LSE)": "BLOK"},
     ]
 
     df_comp = pd.DataFrame(comparison_data)
@@ -1371,6 +1526,77 @@ def render_historical_returns():
                  "https://digital-strategy.ec.europa.eu/en/policies/nis2-directive"),
             ],
         },
+        "Biotech": {
+            "color": "#7f7f7f",
+            "items": [
+                ("US FDA: Oral GLP-1 obesity drug approval expected Q1 2026 \u2014 unlocks $150 billion market",
+                 "Morgan Stanley Healthcare Research 2025",
+                 "https://www.morganstanley.com/ideas/obesity-drugs-market-outlook"),
+                ("US Medicare/Medicaid: GLP-1 coverage at $50 co-pay adds 65 million eligible patients",
+                 "US Government 2025",
+                 "https://www.cms.gov"),
+                ("Biotech M&A 2025: Deal value exceeded full year 2024 by October \u2014 accelerating",
+                 "AlphaSense Biotech Report 2025",
+                 "https://www.alpha-sense.com"),
+            ],
+        },
+        "Robotics": {
+            "color": "#17a2b8",
+            "items": [
+                ("Tesla: Entire Fremont factory converted to Optimus robot production 2026",
+                 "Tesla Q3 2025 Earnings",
+                 "https://ir.tesla.com"),
+                ("China Government: Humanoid robotics designated strategic national industry \u2014 state funding committed",
+                 "Morgan Stanley Robotics Report 2025",
+                 "https://www.morganstanley.com/ideas/humanoid-robots"),
+                ("US DoD: $2.8 billion robotics programme for military applications 2026",
+                 "US Defense Budget 2026",
+                 "https://www.defense.gov/News/Releases/"),
+                ("XPeng: Mass production preparation April 2026, full scale end of 2026",
+                 "XPeng Robotics Division 2025",
+                 "https://www.xpeng.com"),
+            ],
+        },
+        "Gold": {
+            "color": "#ffd700",
+            "items": [
+                ("Central banks globally purchased 1,037 tonnes of gold in 2024 \u2014 highest since 1967",
+                 "World Gold Council 2025",
+                 "https://www.gold.org/goldhub/research/gold-demand-trends"),
+                ("China PBOC added gold to reserves for 18 consecutive months through 2025",
+                 "World Gold Council 2025",
+                 "https://www.gold.org/goldhub/data/monthly-central-bank-statistics"),
+                ("India RBI repatriated 100 tonnes of gold from Bank of England in 2024",
+                 "Reserve Bank of India 2024",
+                 "https://www.rbi.org.in"),
+                ("Poland NBP: Largest single central bank gold purchase in 2024",
+                 "World Gold Council 2025",
+                 "https://www.gold.org/goldhub/research/gold-demand-trends"),
+            ],
+        },
+        "Tokenisation": {
+            "color": "#ff6347",
+            "items": [
+                ("BlackRock: $150 billion in digital asset connected AUM, BUIDL fund at $2.85 billion",
+                 "BlackRock Annual Letter March 23 2026",
+                 "https://www.blackrock.com/corporate/investor-relations/larry-fink-annual-chairman-letter"),
+                ("NYSE launching tokenised securities trading platform with 24/7 trading",
+                 "NYSE March 2026",
+                 "https://www.nyse.com"),
+                ("UK Finance: Pilot for first UK tokenised sterling deposit transactions by 2026",
+                 "UK Finance 2026",
+                 "https://www.ukfinance.org.uk"),
+                ("Nine European banks launching euro stablecoin H2 2026",
+                 "European Banking Consortium 2026",
+                 "https://www.ecb.europa.eu"),
+                ("Real world asset tokenisation surged 300% over 20 months",
+                 "BlackRock / The Block February 2026",
+                 "https://www.theblock.co"),
+                ("BCG: Tokenisation projected to reach $16 trillion by 2030",
+                 "Boston Consulting Group 2024",
+                 "https://www.bcg.com/publications/2022/relevance-of-on-chain-asset-tokenization"),
+            ],
+        },
     }
 
     for section_name, section in commitment_sections.items():
@@ -1420,19 +1646,27 @@ def render_buy_guide(signals: dict):
         {"Theme": "Cybersecurity",        "ETF Name": "iShares Digital Security UCITS",    "IBKR Ticker": "LOCK.L", "Why You Own It": "$248bn market growing to $700bn by 2034 — AI fraud driving unlimited demand",                "Position Size": "Small"},
         {"Theme": "Defence",              "ETF Name": "HANetf Future of Defence UCITS",    "IBKR Ticker": "NATO.L", "Why You Own It": "All 32 NATO members legally committed to 2% GDP — EU ReArm \u20ac800bn",                     "Position Size": "Small"},
         {"Theme": "Rare Earths",          "ETF Name": "VanEck Rare Earth UCITS",           "IBKR Ticker": "REMX.L", "Why You Own It": "China controls 90% of refining — Western governments paying any price for alternatives",      "Position Size": "Small"},
+        {"Theme": "Biotech",              "ETF Name": "iShares Nasdaq US Biotech UCITS",   "IBKR Ticker": "BTEC.L", "Why You Own It": "200+ blockbuster drugs losing patents — big pharma buying biotech firms at premiums",         "Position Size": "Small"},
+        {"Theme": "Robotics",             "ETF Name": "iShares Automation & Robotics UCITS","IBKR Ticker": "RBOT.L","Why You Own It": "Physical AI arriving — Tesla, XPeng racing to mass produce humanoid robots",                 "Position Size": "Small"},
+        {"Theme": "Gold",                 "ETF Name": "iShares Physical Gold ETC",          "IBKR Ticker": "IGLN.L","Why You Own It": "Central banks buying record amounts — portfolio protection when things go wrong",              "Position Size": "Satellite"},
+        {"Theme": "Blockchain Infra",     "ETF Name": "iShares Blockchain Technology UCITS","IBKR Ticker": "BLOK.L","Why You Own It": "Tokenisation infrastructure — BlackRock says this is the internet of finance in 1996",          "Position Size": "Small"},
     ]
 
     # Map IBKR tickers to watchlist/portfolio tickers for signal lookup
     ticker_map = {
         "VWRA.L": "VWRA.L",
         "SEMI.L": "SEMI.L",
-        "INRG.L": "GRID",       # GRID is the US-listed proxy tracked in watchlist
-        "IQQQ.L": "PHO",        # PHO is the US-listed proxy tracked in watchlist
-        "COPA.L": "COPX",       # COPX is the US-listed proxy tracked in watchlist
-        "URAN.L": "URA",        # URA is the US-listed proxy tracked in watchlist
+        "INRG.L": "GRID",
+        "IQQQ.L": "PHO",
+        "COPA.L": "COPX",
+        "URAN.L": "URA",
         "LOCK.L": "LOCK.L",
-        "NATO.L": "ITA",        # ITA is the US-listed proxy tracked in watchlist
+        "NATO.L": "ITA",
         "REMX.L": "REMX",
+        "BTEC.L": "BTEC.L",
+        "RBOT.L": "RBOT.L",
+        "IGLN.L": "IGLN.L",
+        "BLOK.L": "BLOK.L",
     }
 
     for row in guide_data:
@@ -1518,6 +1752,20 @@ def render_portfolio(signals: dict):
                 st.error(f"Error: {item['error']}")
 
             st.info(explain_portfolio(item))
+
+    # Crypto portfolio summary
+    crypto_items = [item for item in signals.get("portfolio", []) if item.get("category") == "crypto"]
+    if len(crypto_items) >= 3:
+        st.markdown(
+            '<div style="background-color:#1a1a2e;border-left:4px solid #ff6347;padding:14px 18px;'
+            'border-radius:4px;margin-top:16px;font-size:0.95em;line-height:1.6;">'
+            'You did not just buy speculative assets. You built a diversified blockchain infrastructure '
+            'portfolio across five layers \u2014 store of value, smart contract platform, next generation '
+            'infrastructure, settlement rails and emerging infrastructure. The tokenisation revolution '
+            'Larry Fink is describing needs all of these layers to work. You were positioned before '
+            'the thesis became mainstream.</div>',
+            unsafe_allow_html=True,
+        )
 
 
 @st.cache_data(ttl=3600)
@@ -1674,6 +1922,127 @@ def render_briefing(briefing_text: str):
         st.info("No briefing generated yet. Click 'Generate Briefing' to create one.")
 
 
+def render_portfolio_map():
+    """Render the Complete Portfolio Map — visual overview of all themes."""
+    st.header("The Complete Portfolio Map")
+    st.caption("Every theme in one view \u2014 organised by role, risk, and time horizon.")
+
+    categories = [
+        {
+            "name": "FOUNDATION",
+            "subtitle": "Own always, never sell",
+            "color": "#1f77b4",
+            "description": (
+                "This is the base everything else sits on. Global equities give you ownership of the "
+                "entire world economy in a single ETF. In any 20-year period in history, diversified "
+                "global equities have made money. This is the position you hold through every crisis, "
+                "every correction, every panic."
+            ),
+            "items": [
+                ("VWRA.L", "Global Equities", "Core"),
+            ],
+        },
+        {
+            "name": "PHYSICAL INFRASTRUCTURE",
+            "subtitle": "Own for 10+ years \u2014 governments committed",
+            "color": "#ff7f0e",
+            "description": (
+                "These themes are backed by committed government spending and physical laws of supply "
+                "and demand. You cannot build an EV without copper. You cannot run a data centre without "
+                "grid connection and water cooling. You cannot print gold. These are the things civilisation "
+                "literally cannot function without."
+            ),
+            "items": [
+                ("INRG.L", "Grid Infrastructure", "Satellite"),
+                ("IQQQ.L", "Water", "Satellite"),
+                ("IGLN.L", "Gold", "Satellite"),
+                ("COPA.L", "Copper", "Satellite"),
+            ],
+        },
+        {
+            "name": "TECHNOLOGY LAYER",
+            "subtitle": "Own for 5\u201310 years \u2014 AI driving demand",
+            "color": "#e377c2",
+            "description": (
+                "The digital layer that sits on top of physical infrastructure. Every chip needs copper. "
+                "Every data centre needs cybersecurity. Every factory will eventually have robots. "
+                "These themes are higher growth but also higher valuation \u2014 the technology is proven "
+                "but the market is pricing in some of the upside already."
+            ),
+            "items": [
+                ("SEMI.L", "Semiconductors", "Small"),
+                ("LOCK.L", "Cybersecurity", "Small"),
+                ("RBOT.L", "Robotics", "Small"),
+            ],
+        },
+        {
+            "name": "HIGH CONVICTION BETS",
+            "subtitle": "Small positions \u2014 higher risk, higher reward",
+            "color": "#d62728",
+            "description": (
+                "These themes have the strongest institutional tailwinds but also the most volatility. "
+                "Keep positions small. The thesis for each one is backed by institutional research, "
+                "but these sectors can drop 30\u201350% before the thesis plays out. Size accordingly."
+            ),
+            "items": [
+                ("BTEC.L", "Biotech", "Small"),
+                ("URAN.L", "Uranium", "Small"),
+                ("REMX.L", "Rare Earths", "Small"),
+                ("NATO.L", "Defence", "Small"),
+            ],
+        },
+        {
+            "name": "FINANCIAL INFRASTRUCTURE",
+            "subtitle": "The system that will tokenise everything else",
+            "color": "#ff6347",
+            "description": (
+                "Larry Fink \u2014 managing $14 trillion at BlackRock \u2014 said two days ago that "
+                "tokenisation will do for finance what the internet did for information. You already "
+                "hold crypto. But crypto is just one application. The bigger opportunity is the infrastructure "
+                "being built to tokenise real world assets \u2014 property, shares, bonds, art, private equity."
+            ),
+            "items": [
+                ("BLOK.L", "Blockchain Infrastructure ETF", "Small"),
+                ("BTC", "Bitcoin \u2014 digital gold, store of value", "Existing"),
+                ("ETH", "Ethereum \u2014 tokenisation infrastructure layer", "Existing"),
+                ("SOL", "Solana \u2014 next gen blockchain", "Existing"),
+                ("SUI", "Sui \u2014 emerging infrastructure", "Existing"),
+                ("XRP", "XRP \u2014 payment and settlement rails", "Existing"),
+            ],
+        },
+    ]
+
+    for cat in categories:
+        color = cat["color"]
+        st.markdown(
+            f'<div style="border-left:4px solid {color};padding:12px 18px;margin-bottom:4px;">'
+            f'<h3 style="margin:0;color:{color};">{cat["name"]}</h3>'
+            f'<em style="color:rgba(255,255,255,0.6);">{cat["subtitle"]}</em></div>',
+            unsafe_allow_html=True,
+        )
+        st.caption(cat["description"])
+
+        cols = st.columns(min(len(cat["items"]), 4))
+        for i, (ticker, label, size) in enumerate(cat["items"]):
+            with cols[i % len(cols)]:
+                st.markdown(
+                    f'<div style="background-color:#262730;padding:10px 14px;border-radius:6px;'
+                    f'border-top:3px solid {color};margin-bottom:8px;text-align:center;">'
+                    f'<strong>{ticker}</strong><br/>'
+                    f'<span style="font-size:0.85em;">{label}</span><br/>'
+                    f'<span style="font-size:0.75em;color:rgba(255,255,255,0.5);">{size}</span></div>',
+                    unsafe_allow_html=True,
+                )
+        st.markdown("")  # spacing
+
+    st.caption(
+        "This is a research framework not a recommendation. Everything here is based on publicly available "
+        "institutional research. Start with the Foundation. Add Physical Infrastructure. Build the Technology "
+        "Layer slowly. Keep High Conviction Bets small. Financial Infrastructure you already have through "
+        "your crypto. Nothing here is financial advice. Always do your own research."
+    )
+
+
 def check_password() -> bool:
     """Prompt for password if DASHBOARD_PASSWORD is set. Returns True if access is granted."""
     if not DASHBOARD_PASSWORD:
@@ -1722,6 +2091,10 @@ def main():
         f'border-radius:4px;margin-bottom:16px;font-size:1.05em;line-height:1.6;">{summary}</div>',
         unsafe_allow_html=True,
     )
+
+    # Portfolio Map — first visible section
+    render_portfolio_map()
+    st.divider()
 
     # Render sections
     render_alerts(alerts)
