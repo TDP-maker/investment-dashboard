@@ -1783,6 +1783,123 @@ def _fetch_price_history(ticker: str, period: str) -> pd.DataFrame:
         return pd.DataFrame()
 
 
+# Historical drawdown profiles and entry levels per theme/ticker
+# Drawdown pct = typical pullback from 52w high before recovery
+ENTRY_PROFILES = {
+    "COPX":    {"drawdown": (20, 30), "recovery_weeks": "6-12",  "conservative": 0.90, "good": 0.82, "great": 0.72},
+    "HG=F":    {"drawdown": (15, 25), "recovery_weeks": "4-8",   "conservative": 0.92, "good": 0.85, "great": 0.78},
+    "URA":     {"drawdown": (25, 40), "recovery_weeks": "8-16",  "conservative": 0.85, "good": 0.75, "great": 0.65},
+    "URNM":    {"drawdown": (25, 40), "recovery_weeks": "8-16",  "conservative": 0.85, "good": 0.75, "great": 0.65},
+    "U-UN.TO": {"drawdown": (15, 25), "recovery_weeks": "4-10",  "conservative": 0.90, "good": 0.83, "great": 0.77},
+    "GRID":    {"drawdown": (15, 25), "recovery_weeks": "4-8",   "conservative": 0.92, "good": 0.85, "great": 0.78},
+    "PHO":     {"drawdown": (12, 20), "recovery_weeks": "4-8",   "conservative": 0.93, "good": 0.88, "great": 0.82},
+    "REMX":    {"drawdown": (25, 40), "recovery_weeks": "8-16",  "conservative": 0.85, "good": 0.75, "great": 0.65},
+    "ITA":     {"drawdown": (12, 20), "recovery_weeks": "4-8",   "conservative": 0.93, "good": 0.88, "great": 0.82},
+    "PPA":     {"drawdown": (12, 20), "recovery_weeks": "4-8",   "conservative": 0.93, "good": 0.88, "great": 0.82},
+    "SEMI.L":  {"drawdown": (20, 35), "recovery_weeks": "6-12",  "conservative": 0.88, "good": 0.80, "great": 0.70},
+    "LOCK.L":  {"drawdown": (15, 25), "recovery_weeks": "4-10",  "conservative": 0.90, "good": 0.85, "great": 0.78},
+    "BTEC.L":  {"drawdown": (20, 35), "recovery_weeks": "8-14",  "conservative": 0.88, "good": 0.78, "great": 0.68},
+    "RBOT.L":  {"drawdown": (18, 28), "recovery_weeks": "6-12",  "conservative": 0.90, "good": 0.82, "great": 0.75},
+    "IGLN.L":  {"drawdown": (8, 15),  "recovery_weeks": "4-8",   "conservative": 0.95, "good": 0.92, "great": 0.88},
+    "BLOK.L":  {"drawdown": (20, 35), "recovery_weeks": "6-14",  "conservative": 0.88, "good": 0.80, "great": 0.70},
+}
+
+
+def _render_entry_timing(item: dict):
+    """Render the Entry Timing section for a single watchlist item."""
+    ticker = item.get("ticker", "")
+    if not ticker or "error" in item:
+        return
+
+    price = item.get("current_price")
+    high_52w = item.get("high_52w")
+    low_52w = item.get("low_52w")
+    name = item.get("name", ticker)
+
+    if not all([price, high_52w, low_52w]) or high_52w == low_52w:
+        return
+
+    price = float(price)
+    high_52w = float(high_52w)
+    low_52w = float(low_52w)
+
+    # Position within 52-week range (0 = at low, 1 = at high)
+    range_pct = (price - low_52w) / (high_52w - low_52w)
+    range_pct = max(0.0, min(1.0, range_pct))
+
+    if range_pct > 0.75:
+        zone = "Near High"
+        zone_color = "#d50000"
+    elif range_pct > 0.35:
+        zone = "Middle"
+        zone_color = "#ffa000"
+    else:
+        zone = "Near Low"
+        zone_color = "#00c853"
+
+    # Entry profiles
+    profile = ENTRY_PROFILES.get(ticker, {"drawdown": (15, 25), "recovery_weeks": "4-8",
+                                          "conservative": 0.92, "good": 0.85, "great": 0.78})
+    dd_low, dd_high = profile["drawdown"]
+    recovery = profile["recovery_weeks"]
+    cons_price = high_52w * profile["conservative"]
+    good_price = high_52w * profile["good"]
+    great_price = high_52w * profile["great"]
+
+    # Build the visual
+    st.markdown(
+        f'<div style="background-color:#1a1a2e;border-radius:6px;padding:12px 16px;margin:8px 0;">'
+        f'<strong style="font-size:0.9em;">Entry Timing</strong>'
+
+        # Progress bar
+        f'<div style="position:relative;height:24px;background:linear-gradient(to right, #00c853, #ffa000, #d50000);'
+        f'border-radius:12px;margin:10px 0 6px 0;">'
+        f'<div style="position:absolute;left:{range_pct*100:.0f}%;top:-2px;transform:translateX(-50%);">'
+        f'<div style="width:3px;height:28px;background:white;border-radius:2px;"></div></div></div>'
+
+        # Labels
+        f'<div style="display:flex;justify-content:space-between;font-size:0.75em;color:rgba(255,255,255,0.5);">'
+        f'<span>${low_52w:,.2f}</span>'
+        f'<span style="color:{zone_color};font-weight:bold;">{zone} ({range_pct*100:.0f}%)</span>'
+        f'<span>${high_52w:,.2f}</span></div>'
+
+        # Drawdown info
+        f'<div style="font-size:0.85em;margin-top:10px;color:rgba(255,255,255,0.8);">'
+        f'Typical pullback: <strong>{dd_low}-{dd_high}%</strong> from highs before recovering '
+        f'(usually {recovery} weeks)</div>'
+
+        # Entry levels
+        f'<div style="display:flex;gap:12px;margin-top:8px;font-size:0.82em;">'
+        f'<span style="color:#ffa000;">Conservative: <strong>${cons_price:,.2f}</strong></span>'
+        f'<span style="color:#00c853;">Good: <strong>${good_price:,.2f}</strong></span>'
+        f'<span style="color:#17becf;">Great: <strong>${great_price:,.2f}</strong></span></div>'
+
+        f'</div>',
+        unsafe_allow_html=True,
+    )
+
+    # Plain English recommendation
+    if range_pct > 0.75:
+        pct_above_good = ((price - good_price) / good_price) * 100
+        st.caption(
+            f"{name} is currently near its 52-week high. Consider waiting for a pullback to "
+            f"${good_price:,.2f} before entering ({pct_above_good:.0f}% below current). "
+            f"Set a limit order and let the market come to you."
+        )
+    elif range_pct > 0.35:
+        st.caption(
+            f"{name} is in the middle of its 52-week range. Not a screaming buy, not expensive either. "
+            f"A pullback to ${good_price:,.2f} would be a better entry. Watch and wait."
+        )
+    else:
+        pct_from_low = ((price - low_52w) / low_52w) * 100
+        st.caption(
+            f"{name} is near its 52-week low — this is where long-term positions get built. "
+            f"Current price is only {pct_from_low:.0f}% above the yearly low. "
+            f"If you believe in the thesis, this is the entry window."
+        )
+
+
 def render_watchlist(signals: dict):
     """Render watchlist section grouped by theme with optional price charts."""
     st.header("Thematic Watchlist")
@@ -1837,6 +1954,10 @@ def render_watchlist(signals: dict):
                             xaxis=dict(title=""),
                         )
                         st.plotly_chart(chart_fig, use_container_width=True)
+
+                # Entry timing
+                if "error" not in item:
+                    _render_entry_timing(item)
 
 
 def render_macro(signals: dict):
