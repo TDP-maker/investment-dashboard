@@ -7,6 +7,8 @@ interpretations of market signals for a long-term investor.
 
 import streamlit as st
 import pandas as pd
+import plotly.graph_objects as go
+import yfinance as yf
 from datetime import datetime
 
 from config import PORTFOLIO, WATCHLIST, THRESHOLDS, DASHBOARD_PASSWORD
@@ -352,6 +354,193 @@ def generate_summary_box(signals: dict, alerts: list) -> str:
     return f"{mood} {action}"
 
 
+# ---------------------------------------------------------------------------
+# Historical performance — growth of $10,000
+# ---------------------------------------------------------------------------
+
+# One representative ticker per theme, chosen for longest available history.
+# VT is used as a proxy for VWRA (VT launched 2008, VWRA only 2019).
+HISTORICAL_TICKERS = {
+    "VWRA (via VT)": "VT",       # Vanguard Total World — proxy for VWRA, 2008+
+    "Copper": "COPX",             # Global X Copper Miners, 2010+
+    "Uranium": "URA",             # Global X Uranium, 2010+
+    "Grid Infra": "GRID",         # First Trust Smart Grid, 2009+
+    "Water": "PHO",               # Invesco Water Resources, 2005+
+    "Rare Earths": "REMX",        # VanEck Rare Earth, 2010+
+    "Defence": "ITA",             # iShares Aerospace & Defense, 2003+
+}
+
+THEME_COLORS = {
+    "VWRA (via VT)": "#1f77b4",
+    "Copper": "#d62728",
+    "Uranium": "#2ca02c",
+    "Grid Infra": "#ff7f0e",
+    "Water": "#17becf",
+    "Rare Earths": "#9467bd",
+    "Defence": "#8c564b",
+}
+
+
+@st.cache_data(ttl=86400)
+def load_historical_data() -> pd.DataFrame:
+    """Fetch monthly closing prices for each theme ticker from 2007 to today."""
+    start = "2007-01-01"
+    all_series = {}
+
+    for label, ticker in HISTORICAL_TICKERS.items():
+        try:
+            df = yf.download(ticker, start=start, interval="1mo", progress=False)
+            if df.empty:
+                continue
+            # yfinance may return MultiIndex columns for single ticker
+            close = df["Close"].squeeze()
+            if isinstance(close, pd.DataFrame):
+                close = close.iloc[:, 0]
+            # Normalise to $10,000
+            first_valid = close.first_valid_index()
+            if first_valid is None:
+                continue
+            close = close.loc[first_valid:]
+            normalised = (close / close.iloc[0]) * 10_000
+            all_series[label] = normalised
+        except Exception:
+            continue
+
+    if not all_series:
+        return pd.DataFrame()
+
+    combined = pd.DataFrame(all_series)
+    combined.index = pd.to_datetime(combined.index)
+    combined = combined.sort_index()
+    return combined
+
+
+def _cycle_commentary(label: str, current_val: float, peak_val: float, peak_date) -> str:
+    """Plain English one-liner about where we are in the cycle."""
+    pct_from_peak = ((current_val - peak_val) / peak_val) * 100
+    total_return = ((current_val - 10_000) / 10_000) * 100
+
+    peak_str = peak_date.strftime("%b %Y") if hasattr(peak_date, "strftime") else str(peak_date)
+
+    if abs(pct_from_peak) < 5:
+        position = f"right near its all-time high (peaked {peak_str})"
+    elif pct_from_peak > -15:
+        position = f"slightly below its peak from {peak_str} ({pct_from_peak:+.0f}%)"
+    elif pct_from_peak > -30:
+        position = f"well off its {peak_str} peak ({pct_from_peak:+.0f}%) — mid-cycle pullback territory"
+    elif pct_from_peak > -50:
+        position = f"deep into a drawdown ({pct_from_peak:+.0f}% from {peak_str} peak) — historically these recoveries take 1-3 years"
+    else:
+        position = f"in a severe drawdown ({pct_from_peak:+.0f}% from {peak_str} peak) — either the thesis has changed or this is a generational entry"
+
+    if total_return > 0:
+        return f"$10K invested at the start would be worth ${current_val:,.0f} today ({total_return:+,.0f}%). Currently {position}."
+    else:
+        return f"$10K invested at the start would be worth ${current_val:,.0f} today ({total_return:+,.0f}%). Currently {position}."
+
+
+def render_historical_performance():
+    """Render the historical performance section with growth chart and commentary."""
+    st.header("Historical Performance")
+    st.caption("How would $10,000 have grown in each theme since 2007? This helps you see where we are in each cycle.")
+
+    hist = load_historical_data()
+    if hist.empty:
+        st.warning("Couldn't load historical data. Try refreshing.")
+        return
+
+    # --- Main chart: all themes ---
+    fig = go.Figure()
+    for label in hist.columns:
+        series = hist[label].dropna()
+        fig.add_trace(go.Scatter(
+            x=series.index,
+            y=series.values,
+            name=label,
+            mode="lines",
+            line=dict(color=THEME_COLORS.get(label, "#999"), width=2.5 if "VWRA" in label else 1.5),
+            opacity=1.0 if "VWRA" in label else 0.85,
+        ))
+
+    fig.update_layout(
+        title="Growth of $10,000 — Each Watchlist Theme vs VWRA",
+        yaxis_title="Portfolio Value ($)",
+        xaxis_title="",
+        hovermode="x unified",
+        template="plotly_dark",
+        height=500,
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="center", x=0.5),
+        yaxis=dict(tickprefix="$", tickformat=","),
+    )
+
+    # Add key events as vertical lines
+    events = {
+        "2008-09-15": "Lehman collapse",
+        "2020-03-23": "COVID bottom",
+        "2022-01-03": "2022 bear market starts",
+    }
+    for date_str, event_label in events.items():
+        fig.add_vline(x=date_str, line_dash="dot", line_color="rgba(255,255,255,0.3)")
+        fig.add_annotation(
+            x=date_str, y=1.05, yref="paper", text=event_label,
+            showarrow=False, font=dict(size=10, color="rgba(255,255,255,0.5)"),
+        )
+
+    st.plotly_chart(fig, use_container_width=True)
+
+    # --- Per-theme commentary ---
+    st.subheader("Where are we in each cycle?")
+
+    cols = st.columns(2)
+    for i, label in enumerate(hist.columns):
+        series = hist[label].dropna()
+        if series.empty:
+            continue
+
+        current_val = series.iloc[-1]
+        peak_val = series.max()
+        peak_date = series.idxmax()
+
+        with cols[i % 2]:
+            color = THEME_COLORS.get(label, "#999")
+            commentary = _cycle_commentary(label, current_val, peak_val, peak_date)
+            st.markdown(
+                f'<div style="border-left:3px solid {color};padding:8px 12px;margin-bottom:12px;">'
+                f'<strong>{label}</strong><br/>'
+                f'<span style="font-size:0.92em;">{commentary}</span></div>',
+                unsafe_allow_html=True,
+            )
+
+    # --- Individual theme charts ---
+    with st.expander("Individual theme charts", expanded=False):
+        for label in hist.columns:
+            series = hist[label].dropna()
+            if series.empty:
+                continue
+
+            fig_small = go.Figure()
+            fig_small.add_trace(go.Scatter(
+                x=series.index, y=series.values,
+                fill="tozeroy",
+                line=dict(color=THEME_COLORS.get(label, "#999"), width=2),
+                fillcolor=THEME_COLORS.get(label, "#999").replace(")", ",0.1)").replace("rgb", "rgba")
+                    if "rgb" in THEME_COLORS.get(label, "") else f"rgba(100,100,100,0.1)",
+            ))
+            # Add $10K baseline
+            fig_small.add_hline(y=10_000, line_dash="dash", line_color="rgba(255,255,255,0.3)",
+                                annotation_text="$10K start", annotation_font_color="rgba(255,255,255,0.4)")
+
+            fig_small.update_layout(
+                title=f"{label}",
+                yaxis=dict(tickprefix="$", tickformat=","),
+                template="plotly_dark",
+                height=250,
+                showlegend=False,
+                margin=dict(l=50, r=20, t=40, b=30),
+            )
+            st.plotly_chart(fig_small, use_container_width=True)
+
+
 @st.cache_data(ttl=3600)
 def load_all_data():
     """Load all data sources with caching."""
@@ -606,6 +795,10 @@ def main():
             st.markdown(f"{signal_badge(signal)} **{name}**: {value} {unit}", unsafe_allow_html=True)
             st.caption(explain_scraped(key, data))
         st.divider()
+
+    # Historical performance
+    render_historical_performance()
+    st.divider()
 
     # Briefing section
     st.header("Weekly Briefing")
