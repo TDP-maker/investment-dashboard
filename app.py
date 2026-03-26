@@ -1211,55 +1211,159 @@ def render_historical_returns():
     st.divider()
 
     # ------------------------------------------------------------------
-    # 4. Government & Institutional Commitments
+    # 4. Government & Institutional Commitments — ALL themes
     # ------------------------------------------------------------------
     st.subheader("Government & Institutional Commitments")
-    st.caption("Money that's already been committed or legislated — not promises, but budgets and contracts.")
+    st.caption("Money that's already been committed or legislated — not promises, but budgets and contracts. Every source is clickable so you can verify it yourself.")
 
-    commitments = [
-        {
-            "commitment": "$6.7 trillion needed for water infrastructure by 2030",
-            "source": "World Bank & OECD \u2014 Infrastructure Outlook 2024",
+    commitment_sections = {
+        "Water": {
             "color": "#17becf",
+            "items": [
+                ("$6.7 trillion needed for water infrastructure by 2030",
+                 "World Bank & OECD Infrastructure Outlook 2024",
+                 "https://www.worldbank.org/en/topic/waterresourcesmanagement"),
+                ("$30 billion water pipeline programme by 2030",
+                 "Kingdom of Saudi Arabia — National Water Strategy 2030",
+                 "https://www.vision2030.gov.sa"),
+                ("\u00a3600 million innovation fund for water sector to 2030",
+                 "UK Ofwat — Water Innovation Strategy 2024",
+                 "https://www.ofwat.gov.uk/regulated-companies/innovation-in-the-water-sector/"),
+                ("$15 billion climate-resilient water investments 2026\u20132030",
+                 "Global Water Partnership — Climate Resilience Programme",
+                 "https://www.gwp.org"),
+                ("96% of institutional water investors increasing spending in 2025",
+                 "Global Water Intelligence — Annual Survey 2024",
+                 "https://www.globalwaterintel.com"),
+                ("AI data centres to consume 11x more water by 2028",
+                 "Morgan Stanley Research 2025",
+                 "https://www.morganstanley.com/ideas/water-scarcity"),
+            ],
         },
-        {
-            "commitment": "$30 billion water pipeline programme by 2030",
-            "source": "Kingdom of Saudi Arabia \u2014 National Water Strategy 2030",
-            "color": "#17becf",
-        },
-        {
-            "commitment": "\u00a3600 million innovation fund for water sector to 2030",
-            "source": "UK Ofwat \u2014 Water Innovation Strategy 2024",
-            "color": "#17becf",
-        },
-        {
-            "commitment": "\u20ac584 billion grid and water investment this decade",
-            "source": "European Commission \u2014 REPowerEU & Critical Raw Materials Act 2024",
+        "Grid Infrastructure": {
             "color": "#ff7f0e",
+            "items": [
+                ("Grid investment must double to $600 billion per year by 2030",
+                 "IEA Electricity Grids and Secure Energy Transitions 2023",
+                 "https://www.iea.org/reports/electricity-grids-and-secure-energy-transitions"),
+                ("60 countries at COP29 committed to doubling global grid investments by 2030",
+                 "IEA Breakthrough Agenda Report 2025",
+                 "https://www.iea.org/reports/breakthrough-agenda-report-2025/power"),
+                ("80 million km of new grid needed by 2040",
+                 "IEA World Energy Outlook 2025",
+                 "https://www.iea.org/reports/world-energy-outlook-2025"),
+                ("\u20ac584 billion grid investment this decade",
+                 "European Parliament Grid Report 2025",
+                 "https://www.europarl.europa.eu"),
+                ("US: 60% expansion of transmission systems needed by 2030",
+                 "US DOE Grid Deployment Office",
+                 "https://www.energy.gov/gdo"),
+            ],
         },
-        {
-            "commitment": "$15 billion climate-resilient water investments 2026\u20132030",
-            "source": "Global Water Partnership \u2014 Climate Resilience Programme",
-            "color": "#17becf",
+        "Copper": {
+            "color": "#d62728",
+            "items": [
+                ("Demand growing from 28Mt to 50Mt by 2035 in net zero scenario",
+                 "S&P Global — The Future of Copper 2022",
+                 "https://www.spglobal.com/commodityinsights/en/market-insights/latest-news/energy-transition/071422-infographic-the-future-of-copper"),
+                ("Fair value $11,300 per tonne",
+                 "Goldman Sachs Commodities Research 2024",
+                 "https://www.goldmansachs.com/insights/articles/copper-is-the-new-oil"),
+                ("Copper demand for clean energy to quadruple by 2040",
+                 "IEA Critical Minerals Report 2024",
+                 "https://www.iea.org/reports/global-critical-minerals-outlook-2024"),
+                ("Copper designated a critical national security material",
+                 "US Department of Defense Critical Materials List",
+                 "https://www.defense.gov"),
+            ],
         },
-        {
-            "commitment": "96% of institutional water investors increasing spending in 2025",
-            "source": "Global Water Intelligence \u2014 Annual Survey 2024",
+        "Uranium": {
             "color": "#2ca02c",
+            "items": [
+                ("Nuclear capacity to double to 746GWe by 2040",
+                 "World Nuclear Association Market Report 2025",
+                 "https://www.world-nuclear.org/nuclear-essentials/how-can-nuclear-combat-climate-change"),
+                ("20+ countries at COP28 pledged to triple nuclear capacity by 2050",
+                 "IAEA COP28 Declaration",
+                 "https://www.iaea.org/newscenter/news/cop28-over-20-countries-pledge-to-triple-nuclear-energy-capacity-by-2050"),
+                ("Microsoft, Google, Amazon all signed nuclear power purchase agreements 2024\u20132025",
+                 "Bloomberg Energy 2025",
+                 "https://www.bloomberg.com/energy"),
+                ("US, UK, France, Japan all announced major nuclear new build programmes",
+                 "WNA Country Profiles",
+                 "https://www.world-nuclear.org/information-library/country-profiles"),
+            ],
         },
-    ]
+        "Rare Earths": {
+            "color": "#9467bd",
+            "items": [
+                ("US DoD took equity stake in MP Materials",
+                 "US Department of Defense Press Release 2024",
+                 "https://www.defense.gov"),
+                ("Apple committed $500 million to US rare earth supply chain",
+                 "Apple Newsroom 2024",
+                 "https://www.apple.com/newsroom/"),
+                ("EU Critical Raw Materials Act mandates 10% domestic production by 2030",
+                 "European Commission",
+                 "https://ec.europa.eu/growth/sectors/raw-materials/areas-specific-interest/critical-raw-materials_en"),
+                ("China restricting gallium, germanium, graphite exports",
+                 "Reuters / Bloomberg 2024",
+                 "https://www.reuters.com/markets/commodities/"),
+            ],
+        },
+        "Defence": {
+            "color": "#8c564b",
+            "items": [
+                ("All 32 NATO members committed to minimum 2% GDP spending",
+                 "NATO Official Communiqu\u00e9 2024",
+                 "https://www.nato.int/cps/en/natohq/official_texts.htm"),
+                ("Germany: \u20ac100 billion special defence fund",
+                 "German Federal Government",
+                 "https://www.bundesregierung.de/breg-en"),
+                ("EU: \u20ac800 billion ReArm Europe programme March 2026",
+                 "European Commission",
+                 "https://ec.europa.eu/commission/presscorner/home/en"),
+                ("UK committed to 2.5% GDP by 2027",
+                 "UK Ministry of Defence",
+                 "https://www.gov.uk/government/organisations/ministry-of-defence"),
+            ],
+        },
+        "Semiconductors": {
+            "color": "#e377c2",
+            "items": [
+                ("US CHIPS Act: $52 billion for domestic semiconductor manufacturing",
+                 "US Department of Commerce",
+                 "https://www.commerce.gov/chips"),
+                ("EU Chips Act: \u20ac43 billion to double EU semiconductor market share by 2030",
+                 "European Commission",
+                 "https://ec.europa.eu/info/strategy/priorities-2019-2024/europe-fit-digital-age/european-chips-act_en"),
+                ("Big Five tech companies: $300 billion+ AI infrastructure capex in 2026",
+                 "Bloomberg Intelligence 2026",
+                 "https://www.bloomberg.com/professional/insights/"),
+                ("TSMC: $165 billion global expansion programme 2025\u20132029",
+                 "TSMC Annual Report 2025",
+                 "https://www.tsmc.com/english/investorRelations"),
+            ],
+        },
+    }
 
-    for item in commitments:
-        st.markdown(
-            f'<div style="border-left:3px solid {item["color"]};padding:8px 14px;margin-bottom:10px;">'
-            f'<strong>{item["commitment"]}</strong><br/>'
-            f'<span style="font-size:0.85em;color:rgba(255,255,255,0.6);">{item["source"]}</span></div>',
-            unsafe_allow_html=True,
-        )
+    for section_name, section in commitment_sections.items():
+        color = section["color"]
+        with st.expander(f"{section_name}", expanded=True):
+            for commitment, source_name, url in section["items"]:
+                st.markdown(
+                    f'<div style="border-left:3px solid {color};padding:8px 14px;margin-bottom:10px;">'
+                    f'<strong>{commitment}</strong><br/>'
+                    f'<span style="font-size:0.85em;">'
+                    f'<a href="{url}" target="_blank" style="color:rgba(180,210,255,0.85);text-decoration:none;">'
+                    f'{source_name} \u2197</a></span></div>',
+                    unsafe_allow_html=True,
+                )
 
     st.caption(
         "These figures represent committed government budgets, multilateral development bank programmes, "
-        "and institutional survey data. They reflect spending that is already in motion, not aspirational targets."
+        "legislative acts, and corporate announcements. They reflect spending that is already in motion, "
+        "not aspirational targets. Click any source to verify the figure independently."
     )
 
 
