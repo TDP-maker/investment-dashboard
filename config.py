@@ -94,6 +94,14 @@ WATCHLIST = {
                  "including ASML, TSMC, and the supply chain that makes AI chips possible. Higher risk "
                  "and valuation than infrastructure themes — smaller position appropriate. Ireland domiciled UCITS ETF.",
     },
+    "LOCK.L": {
+        "name": "iShares Digital Security UCITS ETF",
+        "theme": "cybersecurity",
+        "notes": "Cybersecurity — protecting the digital world from AI-powered fraud and data breaches. "
+                 "Market growing from $248 billion in 2026 to $700 billion by 2034. Every AI data centre, "
+                 "every smart grid, every digital transaction needs protection. This is the digital security "
+                 "layer on top of all the physical infrastructure themes.",
+    },
 }
 
 # --- Macro Indicators ---
@@ -149,6 +157,13 @@ THRESHOLDS = {
         "value": None,  # Set dynamically as 85% of current price (15% drawdown)
         "pct_drop": 15,
         "signal": "Semiconductor ETF 15% drawdown — potential entry signal",
+    },
+    "lock_drawdown": {
+        "ticker": "LOCK.L",
+        "condition": "below",
+        "value": None,  # Set dynamically as 85% of current price (15% drawdown)
+        "pct_drop": 15,
+        "signal": "Cybersecurity ETF 15% drawdown — potential entry signal",
     },
 }
 

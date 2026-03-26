@@ -135,6 +135,11 @@ def explain_watchlist(item: dict) -> str:
             "AMBER": f"Semiconductor stocks pulled back {abs(weekly):.1f}% this week. These are volatile — AI hype swings both ways.",
             "RED": "Chip stocks are in a correction. If AI spending holds up, this could be an entry — but it's a higher-risk theme.",
         },
+        "cybersecurity": {
+            "GREEN": "Cybersecurity stocks are strong. Every new data centre and smart grid needs protection, and spending keeps rising.",
+            "AMBER": f"Cybersecurity dipped {abs(weekly):.1f}% this week. The threat landscape only grows — dips tend to be temporary.",
+            "RED": "Cybersecurity stocks are under pressure. The $700 billion market by 2034 thesis hasn't changed — could be an opportunity.",
+        },
     }
 
     theme_expl = explanations.get(theme, {})
@@ -983,7 +988,7 @@ def render_historical_returns():
     st.subheader("Verified Historical Returns")
     st.caption("Actual average annual returns by ETF and time period.")
 
-    etfs = ["VWRA (VT)", "Water (PHO)", "Grid (GRID)", "Copper (COPX)", "Uranium (URA)", "Semis (SEMI)"]
+    etfs = ["VWRA (VT)", "Water (PHO)", "Grid (GRID)", "Copper (COPX)", "Uranium (URA)", "Semis (SEMI)", "Cyber (LOCK)"]
     periods = ["20yr", "15yr", "10yr", "5yr"]
 
     returns_data = {
@@ -993,6 +998,7 @@ def render_historical_returns():
         "Copper (COPX)": [None, 8.0,  10.0, 18.0],
         "Uranium (URA)": [None, 5.0,  8.0,  22.0],
         "Semis (SEMI)":  [None, None, 14.0, 25.0],
+        "Cyber (LOCK)":  [None, None, 13.0, 16.0],
     }
 
     colors = {
@@ -1002,6 +1008,7 @@ def render_historical_returns():
         "Copper (COPX)": "#d62728",
         "Uranium (URA)": "#2ca02c",
         "Semis (SEMI)":  "#e377c2",
+        "Cyber (LOCK)":  "#bcbd22",
     }
 
     hist_fig = go.Figure()
@@ -1040,12 +1047,12 @@ def render_historical_returns():
     st.caption("Based on institutional demand forecasts and committed government spending.")
 
     proj_themes = [
-        "VWRA", "Water", "Grid Infra", "Copper", "Uranium", "Semiconductors"
+        "VWRA", "Water", "Grid Infra", "Copper", "Uranium", "Semiconductors", "Cybersecurity"
     ]
-    proj_low =  [9,  12, 15, 12, 14, 12]
-    proj_high = [10, 15, 18, 16, 18, 16]
+    proj_low =  [9,  12, 15, 12, 14, 12, 14]
+    proj_high = [10, 15, 18, 16, 18, 16, 18]
     proj_mid =  [(l + h) / 2 for l, h in zip(proj_low, proj_high)]
-    proj_colors = ["#1f77b4", "#17becf", "#ff7f0e", "#d62728", "#2ca02c", "#e377c2"]
+    proj_colors = ["#1f77b4", "#17becf", "#ff7f0e", "#d62728", "#2ca02c", "#e377c2", "#bcbd22"]
 
     proj_sources = [
         "Vanguard Capital Markets Model",
@@ -1054,6 +1061,7 @@ def render_historical_returns():
         "S&P Global / Goldman Sachs",
         "WNA 2025",
         "Bloomberg / McKinsey 2025",
+        "US DoD / EU NIS2 2024",
     ]
 
     proj_fig = go.Figure()
@@ -1111,10 +1119,10 @@ def render_historical_returns():
     # ------------------------------------------------------------------
     st.subheader("Historical vs Projected — Side by Side Comparison")
 
-    sbs_themes = ["VWRA", "Water", "Grid Infra", "Copper", "Uranium", "Rare Earths", "Defence", "Semis"]
-    sbs_hist   = [11.0, 13.1, 15.0, 10.0, 8.0, 6.0, 12.0, 14.0]
-    sbs_low    = [9,    12,   15,   12,   14,  10,  12,   12]
-    sbs_high   = [10,   15,   18,   16,   18,  14,  15,   16]
+    sbs_themes = ["VWRA", "Water", "Grid Infra", "Copper", "Uranium", "Rare Earths", "Defence", "Semis", "Cyber"]
+    sbs_hist   = [11.0, 13.1, 15.0, 10.0, 8.0, 6.0, 12.0, 14.0, 13.0]
+    sbs_low    = [9,    12,   15,   12,   14,  10,  12,   12,   14]
+    sbs_high   = [10,   15,   18,   16,   18,  14,  15,   16,   18]
 
     sbs_fig = go.Figure()
 
@@ -1189,6 +1197,7 @@ def render_historical_returns():
         {"Theme": "Rare Earths",         "10yr Hist Return": "6%",    "Projected to 2030": "10-14%", "Risk Level": "Very High", "Key Demand Driver": "China export controls, Western supply urgency",      "Position Size": "Small",     "UCITS Ticker (LSE)": "REMX"},
         {"Theme": "Defence",             "10yr Hist Return": "12%",   "Projected to 2030": "12-15%", "Risk Level": "Medium",    "Key Demand Driver": "NATO 2% GDP commitment, EU ReArm \u20ac800bn",       "Position Size": "Small",     "UCITS Ticker (LSE)": "NATO"},
         {"Theme": "Semiconductors",      "10yr Hist Return": "14%",   "Projected to 2030": "12-16%", "Risk Level": "High",      "Key Demand Driver": "AI capex $300bn+ annually, chip monopolies",         "Position Size": "Small",     "UCITS Ticker (LSE)": "SEMI"},
+        {"Theme": "Cybersecurity",       "10yr Hist Return": "13%",   "Projected to 2030": "14-18%", "Risk Level": "Medium",    "Key Demand Driver": "$248bn to $700bn market by 2034, AI-driven threats", "Position Size": "Small",     "UCITS Ticker (LSE)": "LOCK"},
     ]
 
     df_comp = pd.DataFrame(comparison_data)
@@ -1345,6 +1354,23 @@ def render_historical_returns():
                  "https://www.tsmc.com/english/investorRelations"),
             ],
         },
+        "Cybersecurity": {
+            "color": "#bcbd22",
+            "items": [
+                ("US federal cybersecurity spending exceeds $25 billion annually, growing 15% year on year",
+                 "US Department of Defense Cyber Strategy 2024",
+                 "https://www.defense.gov/News/Releases/"),
+                ("EU NIS2 Directive mandates cybersecurity investment across all critical infrastructure",
+                 "European Commission NIS2 Directive 2024",
+                 "https://digital-strategy.ec.europa.eu/en/policies/nis2-directive"),
+                ("Global cybersecurity market growing from $248 billion in 2026 to $700 billion by 2034",
+                 "Fortune Business Insights / Mordor Intelligence 2025",
+                 "https://www.fortunebusinessinsights.com/industry-reports/cyber-security-market-101165"),
+                ("Every grid, water and data infrastructure company in Europe now required to invest in cyber protection",
+                 "European Commission \u2014 NIS2 Critical Infrastructure Requirements",
+                 "https://digital-strategy.ec.europa.eu/en/policies/nis2-directive"),
+            ],
+        },
     }
 
     for section_name, section in commitment_sections.items():
@@ -1435,9 +1461,32 @@ def render_portfolio(signals: dict):
             st.info(explain_portfolio(item))
 
 
+@st.cache_data(ttl=3600)
+def _fetch_price_history(ticker: str, period: str) -> pd.DataFrame:
+    """Fetch price history for a ticker. Returns DataFrame with Date index and Close column."""
+    try:
+        df = yf.download(ticker, period=period, interval="1d" if period == "2y" else "1mo", progress=False)
+        if df.empty:
+            return pd.DataFrame()
+        close = df["Close"].squeeze()
+        if isinstance(close, pd.DataFrame):
+            close = close.iloc[:, 0]
+        return close.to_frame(name="Close")
+    except Exception:
+        return pd.DataFrame()
+
+
 def render_watchlist(signals: dict):
-    """Render watchlist section grouped by theme."""
+    """Render watchlist section grouped by theme with optional price charts."""
     st.header("Thematic Watchlist")
+
+    # View toggle for price charts
+    view_mode = st.radio(
+        "Price chart view",
+        ["No chart", "Monthly (last 24 months)", "Yearly (max history)"],
+        horizontal=True,
+        index=0,
+    )
 
     themes = {}
     for item in signals.get("watchlist", []):
@@ -1449,6 +1498,7 @@ def render_watchlist(signals: dict):
             for item in items:
                 signal = item.get("signal", "AMBER")
                 name = item.get("name", "Unknown")
+                ticker = item.get("ticker", "")
                 if "error" in item:
                     st.markdown(f"{signal_badge(signal)} **{name}** — Error loading data", unsafe_allow_html=True)
                 else:
@@ -1459,6 +1509,27 @@ def render_watchlist(signals: dict):
                         unsafe_allow_html=True,
                     )
                 st.caption(explain_watchlist(item))
+
+                # Price chart
+                if view_mode != "No chart" and ticker:
+                    period = "2y" if "Monthly" in view_mode else "max"
+                    hist = _fetch_price_history(ticker, period)
+                    if not hist.empty:
+                        chart_fig = go.Figure()
+                        chart_fig.add_trace(go.Scatter(
+                            x=hist.index, y=hist["Close"],
+                            mode="lines",
+                            line=dict(color=SIGNAL_COLORS.get(signal, "#1f77b4"), width=1.5),
+                            showlegend=False,
+                        ))
+                        chart_fig.update_layout(
+                            height=180,
+                            template="plotly_dark",
+                            margin=dict(l=40, r=10, t=10, b=20),
+                            yaxis=dict(tickprefix="$"),
+                            xaxis=dict(title=""),
+                        )
+                        st.plotly_chart(chart_fig, use_container_width=True)
 
 
 def render_macro(signals: dict):
