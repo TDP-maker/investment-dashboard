@@ -39,6 +39,319 @@ def signal_badge(signal: str) -> str:
     return f'<span style="background-color:{color};color:white;padding:2px 8px;border-radius:4px;font-weight:bold;font-size:0.85em;">{signal}</span>'
 
 
+# ---------------------------------------------------------------------------
+# Plain English explanation generators
+# ---------------------------------------------------------------------------
+
+def explain_portfolio(item: dict) -> str:
+    """One-liner plain English explanation for a portfolio position."""
+    signal = item.get("signal", "AMBER")
+    ticker = item.get("ticker", "")
+    price = item.get("current_price", 0)
+    weekly = item.get("weekly_change_pct", 0)
+    pct_from_high = item.get("pct_from_high", 0)
+
+    if "error" in item:
+        return "Data isn't loading right now. Nothing to worry about, we'll check again soon."
+
+    if ticker == "VWRA.L":
+        if signal == "GREEN":
+            return f"Price is holding steady. No action needed right now."
+        elif signal == "AMBER":
+            return f"Down {abs(weekly):.1f}% this week. Worth keeping an eye on, but not at buy levels yet."
+        else:
+            return f"Price has dropped to ${price:.2f} — below the $160 support level. This could be an entry opportunity."
+
+    if "SUI" in ticker:
+        if signal == "GREEN":
+            return "SUI is cruising along nicely. Just let it ride."
+        elif signal == "AMBER":
+            return f"SUI pulled back {abs(weekly):.1f}% this week. Crypto swings are normal — watch but don't panic."
+        else:
+            return f"SUI has dropped significantly ({pct_from_high:+.0f}% from its high). Crypto winter vibes. Patience."
+
+    if "XRP" in ticker:
+        if signal == "GREEN":
+            return "XRP is stable. No news is good news here."
+        elif signal == "AMBER":
+            return f"XRP is wobbling a bit ({weekly:+.1f}% this week). Typical crypto volatility."
+        else:
+            return f"XRP took a hit ({pct_from_high:+.0f}% from highs). Sit tight — these cycles take time."
+
+    # Fallback
+    if signal == "GREEN":
+        return "Looking good. No action needed."
+    elif signal == "AMBER":
+        return f"Moved {weekly:+.1f}% this week. Keep watching."
+    return f"Significant move — down {abs(pct_from_high):.0f}% from highs. Be cautious about adding more right now."
+
+
+def explain_watchlist(item: dict) -> str:
+    """One-liner plain English explanation for a watchlist item."""
+    signal = item.get("signal", "AMBER")
+    theme = item.get("theme", "")
+    weekly = item.get("weekly_change_pct", 0)
+    pct_from_high = item.get("pct_from_high", 0)
+
+    if "error" in item:
+        return "Can't fetch data right now. We'll try again later."
+
+    explanations = {
+        "copper": {
+            "GREEN": "Copper miners are doing well. The electrification and infrastructure theme is playing out.",
+            "AMBER": f"Copper is cooling off a bit ({weekly:+.1f}% this week). Not unusual — still in a long-term uptrend.",
+            "RED": "Copper has sold off hard. Could be a buying window if the long-term thesis hasn't changed.",
+        },
+        "uranium": {
+            "GREEN": "Uranium stocks are strong. Nuclear energy demand keeps growing.",
+            "AMBER": f"Uranium names dipped {abs(weekly):.1f}% this week. The sector is volatile but the story is intact.",
+            "RED": "Uranium stocks are under pressure. If you believe in nuclear long-term, these prices get interesting.",
+        },
+        "grid_infrastructure": {
+            "GREEN": "Grid infrastructure is trending up. AI data centres and electrification are driving demand.",
+            "AMBER": "Grid stocks are taking a breather. The need for grid upgrades isn't going away.",
+            "RED": "Grid infrastructure sold off. Rare for this theme — could be worth a closer look.",
+        },
+        "water": {
+            "GREEN": "Water stocks are steady. Quiet and reliable, like the theme itself.",
+            "AMBER": "Water sector pulled back a little. One of the most defensive themes on the list.",
+            "RED": "Even water stocks are down — that usually means broad market stress, not a water-specific problem.",
+        },
+        "rare_earths": {
+            "GREEN": "Rare earth miners are up. Supply concerns and EV demand are supporting prices.",
+            "AMBER": f"Rare earths dipped {abs(weekly):.1f}% this week. This sector swings with China trade news.",
+            "RED": "Rare earth stocks are getting hammered. Highly cyclical — could snap back fast when sentiment shifts.",
+        },
+        "defence": {
+            "GREEN": "Defence stocks are strong. Government spending commitments keep flowing.",
+            "AMBER": "Defence pulled back slightly. Budget cycles cause temporary dips.",
+            "RED": "Defence stocks are down. Unusual given geopolitical backdrop — worth investigating why.",
+        },
+    }
+
+    theme_expl = explanations.get(theme, {})
+    return theme_expl.get(signal, f"Moved {weekly:+.1f}% this week.")
+
+
+def explain_macro(item: dict) -> str:
+    """Plain English explanation for a macro indicator."""
+    if "error" in item:
+        return "Data unavailable right now."
+
+    ticker = item.get("ticker", "")
+    value = item.get("current_price", 0)
+    signal = item.get("signal", "AMBER")
+
+    if "VIX" in ticker:
+        if value < 15:
+            return f"VIX is at {value:.1f} — markets are super calm. Almost too calm. Good for holding, not great for finding bargains."
+        elif value < 20:
+            return f"VIX at {value:.1f} — normal levels. Markets feel fine. Nothing to do."
+        elif value < 25:
+            return f"VIX at {value:.1f} — a little elevated. Markets are slightly nervous but nothing serious."
+        elif value < 30:
+            return f"VIX at {value:.1f} — markets are getting jittery. Not panic level, but pay attention."
+        elif value < 35:
+            return f"VIX at {value:.1f} — markets are nervous but not panicking yet. Above 30 is when opportunities start appearing."
+        else:
+            return f"VIX at {value:.1f} — real fear in the market. Historically, buying 2-4 weeks after a VIX spike above 35 has been rewarding."
+
+    if "DX" in ticker:
+        if value > 110:
+            return f"Dollar index at {value:.1f} — very strong dollar. This squeezes emerging markets and commodities. Headwind for non-USD assets."
+        elif value > 105:
+            return f"Dollar at {value:.1f} — firming up. A strong dollar makes everything priced in USD more expensive for us."
+        else:
+            return f"Dollar at {value:.1f} — relatively calm. Not creating problems for our positions."
+
+    if "CL" in ticker:
+        if value > 100:
+            return f"Oil at ${value:.0f}/barrel — elevated. High energy costs slow the economy and squeeze consumers."
+        elif value > 90:
+            return f"Oil at ${value:.0f}/barrel — on the higher side. Watch for it dropping below $90 as a positive sign for the economy."
+        else:
+            return f"Oil at ${value:.0f}/barrel — manageable levels. Not a concern right now."
+
+    return f"Currently at {value}."
+
+
+def explain_fred(item: dict) -> str:
+    """Plain English explanation for FRED economic data."""
+    if "error" in item:
+        return item.get("error", "Data unavailable.")
+
+    series_id = item.get("series_id", "")
+    value = item.get("current_value", 0)
+
+    if "HYM2" in series_id:
+        if value > 500:
+            return (f"Credit spreads at {value:.0f} basis points — this means companies are paying a lot more to borrow. "
+                    "That's a stress signal. When borrowing gets expensive, stocks usually follow lower.")
+        elif value > 400:
+            return (f"Credit spreads at {value:.0f}bps — creeping up. Companies are paying more to borrow than usual. "
+                    "Not crisis level, but the bond market is getting cautious.")
+        else:
+            return (f"Credit spreads at {value:.0f}bps — normal range. The bond market isn't worried, "
+                    "which is usually a good sign for stocks too.")
+
+    if "T10Y2Y" in series_id:
+        if value < 0:
+            return (f"Yield curve is inverted ({value:+.2f}%). In plain English: short-term interest rates are higher than "
+                    "long-term ones. This has predicted almost every recession. Stay cautious.")
+        elif value < 0.2:
+            return (f"Yield curve is barely positive ({value:.2f}%). It's flat, meaning the bond market is uncertain about "
+                    "economic growth ahead. Worth monitoring.")
+        else:
+            return (f"Yield curve spread is {value:.2f}% — healthy. The bond market expects normal economic conditions. "
+                    "No recession warning here.")
+
+    if "DGS10" in series_id:
+        if value > 5:
+            return (f"10-year Treasury rate at {value:.2f}% — very high. This makes mortgages and business loans expensive. "
+                    "Stocks compete with 'risk-free' 5%+ returns from bonds.")
+        elif value > 4:
+            return (f"10-year rate at {value:.2f}% — elevated but not extreme. Bonds are offering decent returns, "
+                    "which creates some competition for stocks.")
+        else:
+            return f"10-year rate at {value:.2f}% — moderate. Not a major headwind for stocks."
+
+    if "DTWEXBGS" in series_id:
+        return f"Trade-weighted dollar index at {value:.1f}. This tracks the dollar against a basket of currencies."
+
+    return f"Currently at {value}."
+
+
+def explain_cot(key: str, data: dict) -> str:
+    """Plain English explanation for COT positioning data."""
+    if "error" in data:
+        return "COT data unavailable right now."
+
+    signal = data.get("signal", "AMBER")
+    commodity = data.get("commodity", key)
+    consecutive = data.get("consecutive_net_long", False)
+    latest = data.get("latest", {})
+    net = latest.get("commercial_net", 0)
+
+    if "COPPER" in commodity.upper():
+        if consecutive:
+            return ("Big commercial copper buyers (miners, manufacturers) have been accumulating for 3+ weeks straight. "
+                    "This is the signal we watch for — they know their market better than anyone.")
+        elif net > 0:
+            return ("Commercial copper buyers are net long, but not consistently enough yet. "
+                    "Getting interesting — keep watching for a confirmed streak.")
+        else:
+            return ("Commercial copper buyers are net short — they're hedging, not accumulating. "
+                    "Not the right time for copper. Be patient.")
+
+    if "OIL" in commodity.upper() or "CRUDE" in commodity.upper():
+        if consecutive:
+            return ("Oil producers have been net long for 3+ weeks. They're betting on higher prices. "
+                    "This usually means supply is tighter than headlines suggest.")
+        elif net > 0:
+            return "Oil commercials are leaning bullish but the signal isn't confirmed yet. Watch and wait."
+        else:
+            return ("Oil commercials are net short — they expect lower prices or are locking in current levels. "
+                    "No urgency on energy positions.")
+
+    if signal == "GREEN":
+        return f"Commercial {commodity.lower()} traders are positioned bullish. Good sign."
+    elif signal == "AMBER":
+        return f"Mixed positioning in {commodity.lower()}. Not a clear signal yet."
+    return f"Commercials are bearish on {commodity.lower()}. Not the time to add."
+
+
+def explain_scraped(key: str, data: dict) -> str:
+    """Plain English explanation for scraped data."""
+    if "error" in data:
+        return "Couldn't fetch this data right now."
+
+    if key == "uranium_spot":
+        value = data.get("value", 0)
+        if value < 75:
+            return (f"Uranium spot price is ${value:.0f}/lb — below $75, which is below what most contracts are priced at. "
+                    "Miners are selling at a discount. This has historically been a good entry for uranium stocks.")
+        elif value < 90:
+            return f"Uranium at ${value:.0f}/lb — reasonable levels. Not screaming cheap, but the long-term demand story is intact."
+        else:
+            return f"Uranium at ${value:.0f}/lb — price is running. Good for existing positions, but new entries are pricier."
+
+    if key == "baltic_dry_index":
+        value = data.get("value", 0)
+        if value < 1000:
+            return (f"Baltic Dry Index at {value:.0f} — shipping rates are very low. This means less stuff is being "
+                    "moved around the world. Usually a sign the global economy is slowing.")
+        elif value < 1500:
+            return f"Baltic Dry Index at {value:.0f} — moderate shipping activity. Economy is ticking along, nothing dramatic."
+        else:
+            return (f"Baltic Dry Index at {value:.0f} — strong shipping demand. Global trade is healthy, "
+                    "which is good for commodities and emerging markets.")
+
+    return f"Current value: {data.get('value', 'N/A')}"
+
+
+def generate_summary_box(signals: dict, alerts: list) -> str:
+    """Generate a 2-3 sentence plain English summary of the overall situation."""
+    red_count = 0
+    amber_count = 0
+    green_count = 0
+
+    for section in ["portfolio", "watchlist", "macro", "fred"]:
+        for item in signals.get(section, []):
+            s = item.get("signal", "AMBER")
+            if s == "RED":
+                red_count += 1
+            elif s == "AMBER":
+                amber_count += 1
+            else:
+                green_count += 1
+
+    for data in signals.get("cot", {}).values():
+        s = data.get("signal", "AMBER")
+        if s == "RED":
+            red_count += 1
+        elif s == "AMBER":
+            amber_count += 1
+        else:
+            green_count += 1
+
+    for data in signals.get("scraped", {}).values():
+        s = data.get("signal", "AMBER")
+        if s == "RED":
+            red_count += 1
+        elif s == "AMBER":
+            amber_count += 1
+        else:
+            green_count += 1
+
+    total = red_count + amber_count + green_count
+    alert_count = len(alerts)
+
+    # Build the summary
+    if red_count == 0 and amber_count <= 2:
+        mood = "Everything looks calm this week. All signals are steady and there's nothing that needs your attention."
+        action = "Stay patient — this is a hold-and-wait kind of week."
+    elif red_count == 0 and amber_count > 2:
+        mood = f"Mostly fine, but {amber_count} indicators are worth watching. Nothing alarming, just some areas shifting."
+        action = "No action needed yet, but check back if things develop."
+    elif red_count <= 2:
+        mood = (f"A few warning signs this week — {red_count} red signal{'s' if red_count > 1 else ''} "
+                f"and {amber_count} amber. Some areas are under pressure.")
+        if alert_count > 0:
+            action = f"{alert_count} alert{'s' if alert_count > 1 else ''} triggered. Scroll down to see what crossed a threshold — could be an opportunity."
+        else:
+            action = "Worth a closer look, but don't rush into anything. Watch how next week develops."
+    else:
+        mood = (f"Markets are stressed — {red_count} red signals across the board. "
+                "This is the kind of environment where opportunities eventually appear.")
+        if alert_count > 0:
+            action = (f"{alert_count} threshold alert{'s' if alert_count > 1 else ''} triggered. "
+                      "Historically these moments have been good entry points, but give it a few weeks to settle.")
+        else:
+            action = "Be patient. Don't try to catch a falling knife — let the dust settle first."
+
+    return f"{mood} {action}"
+
+
 @st.cache_data(ttl=3600)
 def load_all_data():
     """Load all data sources with caching."""
@@ -82,7 +395,6 @@ def render_portfolio(signals: dict):
     for i, item in enumerate(signals.get("portfolio", [])):
         with cols[i % len(cols)]:
             signal = item.get("signal", "AMBER")
-            color = SIGNAL_COLORS.get(signal, "#666")
 
             st.markdown(f"### {item.get('name', 'Unknown')}")
             st.markdown(f"**Signal:** {signal_badge(signal)}", unsafe_allow_html=True)
@@ -105,6 +417,8 @@ def render_portfolio(signals: dict):
             else:
                 st.error(f"Error: {item['error']}")
 
+            st.info(explain_portfolio(item))
+
 
 def render_watchlist(signals: dict):
     """Render watchlist section grouped by theme."""
@@ -117,25 +431,19 @@ def render_watchlist(signals: dict):
 
     for theme, items in themes.items():
         with st.expander(f"{theme.replace('_', ' ').title()} ({len(items)} tickers)", expanded=True):
-            rows = []
             for item in items:
+                signal = item.get("signal", "AMBER")
+                name = item.get("name", "Unknown")
                 if "error" in item:
-                    rows.append({
-                        "Signal": item.get("signal", "AMBER"),
-                        "Name": item.get("name", "Unknown"),
-                        "Price": "Error",
-                        "Day %": "N/A",
-                        "Week %": "N/A",
-                    })
+                    st.markdown(f"{signal_badge(signal)} **{name}** — Error loading data", unsafe_allow_html=True)
                 else:
-                    rows.append({
-                        "Signal": item.get("signal", "AMBER"),
-                        "Name": item.get("name", "Unknown"),
-                        "Price": f"${item.get('current_price', 'N/A')}",
-                        "Day %": f"{item.get('daily_change_pct', 0):+.2f}%",
-                        "Week %": f"{item.get('weekly_change_pct', 0):+.2f}%",
-                    })
-            st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
+                    price = item.get("current_price", "N/A")
+                    weekly = item.get("weekly_change_pct", 0)
+                    st.markdown(
+                        f"{signal_badge(signal)} **{name}**: ${price} (week: {weekly:+.1f}%)",
+                        unsafe_allow_html=True,
+                    )
+                st.caption(explain_watchlist(item))
 
 
 def render_macro(signals: dict):
@@ -153,8 +461,8 @@ def render_macro(signals: dict):
                 st.markdown(f"{signal_badge(signal)} **{name}**: Error", unsafe_allow_html=True)
             else:
                 value = item.get("current_price", "N/A")
-                daily = item.get("daily_change_pct", 0)
-                st.markdown(f"{signal_badge(signal)} **{name}**: {value} ({daily:+.2f}%)", unsafe_allow_html=True)
+                st.markdown(f"{signal_badge(signal)} **{name}**: {value}", unsafe_allow_html=True)
+            st.caption(explain_macro(item))
 
     with col2:
         st.subheader("Economic Data (FRED)")
@@ -162,20 +470,21 @@ def render_macro(signals: dict):
             signal = item.get("signal", "AMBER")
             name = item.get("name", "Unknown")
             if "error" in item:
-                st.markdown(f"{signal_badge(signal)} **{name}**: {item.get('error', 'N/A')}", unsafe_allow_html=True)
+                st.markdown(f"{signal_badge(signal)} **{name}**: unavailable", unsafe_allow_html=True)
             else:
                 value = item.get("current_value", "N/A")
-                change = item.get("daily_change", 0)
-                st.markdown(f"{signal_badge(signal)} **{name}**: {value} ({change:+.4f})", unsafe_allow_html=True)
+                st.markdown(f"{signal_badge(signal)} **{name}**: {value}", unsafe_allow_html=True)
+            st.caption(explain_fred(item))
 
 
 def render_cot(signals: dict):
     """Render COT data section."""
-    st.header("Commitments of Traders (COT)")
+    st.header("Commitments of Traders")
+    st.caption("What are the big commercial buyers actually doing with their money?")
 
     cot = signals.get("cot", {})
     if not cot:
-        st.info("No COT data available.")
+        st.info("No COT data available right now. This report comes from the CFTC and updates weekly.")
         return
 
     for key, data in cot.items():
@@ -188,8 +497,7 @@ def render_cot(signals: dict):
         col2.metric("Commercial Net", latest.get("commercial_net", "N/A"))
         col3.metric("Spec Net", latest.get("noncommercial_net", "N/A"))
 
-        if data.get("consecutive_net_long"):
-            st.success(f"Signal: {data.get('signal_text', data.get('signal', ''))}")
+        st.caption(explain_cot(key, data))
 
 
 def render_alerts(alerts: list):
@@ -262,6 +570,14 @@ def main():
     # Check alerts
     alerts = check_alerts(portfolio, macro, fred, cot, scraped)
 
+    # Summary box at the top
+    summary = generate_summary_box(signals, alerts)
+    st.markdown(
+        f'<div style="background-color:#1a1a2e;border-left:4px solid #1f77b4;padding:16px 20px;'
+        f'border-radius:4px;margin-bottom:16px;font-size:1.05em;line-height:1.6;">{summary}</div>',
+        unsafe_allow_html=True,
+    )
+
     # Render sections
     render_alerts(alerts)
     st.divider()
@@ -277,6 +593,19 @@ def main():
 
     render_cot(signals)
     st.divider()
+
+    # Scraped data
+    scraped_signals = signals.get("scraped", {})
+    if scraped_signals:
+        st.header("Other Data Sources")
+        for key, data in scraped_signals.items():
+            signal = data.get("signal", "AMBER")
+            name = data.get("name", key.replace("_", " ").title())
+            value = data.get("value", "N/A")
+            unit = data.get("unit", "")
+            st.markdown(f"{signal_badge(signal)} **{name}**: {value} {unit}", unsafe_allow_html=True)
+            st.caption(explain_scraped(key, data))
+        st.divider()
 
     # Briefing section
     st.header("Weekly Briefing")
