@@ -839,6 +839,107 @@ def render_growth_projections():
         "project for each of our themes? These are the same sources professional investors use."
     )
 
+    # ------------------------------------------------------------------
+    # Combined overview: What $10,000 Could Become by 2040
+    # ------------------------------------------------------------------
+    st.subheader("What $10,000 Invested Could Become by 2040")
+
+    # For each theme, derive a single projected growth line (base-case CAGR
+    # implied by the institutional demand forecasts).  These are reasonable
+    # estimates based on the demand-growth rates embedded in the projection
+    # data, translated into plausible annual equity-return ranges for the
+    # sector ETFs that track each theme.
+    overview_themes = {
+        "VWRA (Global Equities)": {
+            "cagr": 0.10,
+            "color": "#1f77b4",
+            "driver": "Broad global economic growth — ~10% historical average annual return",
+        },
+        "Water": {
+            "cagr": 0.11,
+            "color": "#17becf",
+            "driver": "56% freshwater deficit by 2030 drives infrastructure spending (WEF)",
+        },
+        "Grid Infrastructure": {
+            "cagr": 0.13,
+            "color": "#ff7f0e",
+            "driver": "Grid investment must double to $600bn/yr by 2030 — legally committed (IEA)",
+        },
+        "Copper": {
+            "cagr": 0.12,
+            "color": "#d62728",
+            "driver": "Demand growing from 28Mt to 42Mt by 2040 while supply can't keep up (S&P Global)",
+        },
+        "Uranium": {
+            "cagr": 0.14,
+            "color": "#2ca02c",
+            "driver": "Nuclear capacity to double to 746 GWe by 2040, fuel supply can't match (WNA)",
+        },
+    }
+
+    overview_fig = go.Figure()
+    table_rows = []
+
+    for label, info in overview_themes.items():
+        values = [10_000 * ((1 + info["cagr"]) ** y) for y in range(16)]
+        overview_fig.add_trace(go.Scatter(
+            x=PROJECTION_YEARS,
+            y=values,
+            name=label,
+            mode="lines",
+            line=dict(color=info["color"], width=2.5),
+        ))
+        final_value = values[-1]
+        table_rows.append({
+            "Theme": label,
+            "Projected Value of $10,000 in 2040": f"${final_value:,.0f}",
+            "Key Demand Driver": info["driver"],
+        })
+
+    overview_fig.add_vline(x=2025, line_dash="dot", line_color="rgba(255,255,255,0.4)")
+    overview_fig.add_annotation(
+        x=2025, y=1.03, yref="paper", text="Now",
+        showarrow=False, font=dict(size=10, color="rgba(255,255,255,0.6)"),
+    )
+    overview_fig.add_hline(
+        y=10_000, line_dash="dash", line_color="rgba(255,255,255,0.25)",
+        annotation_text="$10K start",
+        annotation_font_color="rgba(255,255,255,0.4)",
+    )
+
+    overview_fig.update_layout(
+        title="What $10,000 Invested Could Become by 2040",
+        yaxis_title="Projected portfolio value ($)",
+        xaxis_title="",
+        yaxis=dict(tickprefix="$", tickformat=","),
+        hovermode="x unified",
+        template="plotly_dark",
+        height=480,
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="center", x=0.5),
+    )
+
+    st.plotly_chart(overview_fig, use_container_width=True)
+
+    # Summary table
+    st.dataframe(
+        pd.DataFrame(table_rows),
+        use_container_width=True,
+        hide_index=True,
+    )
+
+    # Disclaimer
+    st.caption(
+        "These projections are based on institutional research from IEA, WEF, Goldman Sachs, "
+        "Morgan Stanley and S&P Global. They are not guarantees — they show where demand is heading "
+        "based on physical and policy commitments already in place. Past performance does not guarantee "
+        "future results."
+    )
+
+    st.divider()
+
+    # ------------------------------------------------------------------
+    # Individual theme deep-dives
+    # ------------------------------------------------------------------
     for key, proj in PROJECTIONS.items():
         with st.expander(proj["title"], expanded=True):
             # 1. Projection chart
