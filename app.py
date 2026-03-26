@@ -1106,6 +1106,55 @@ def render_historical_returns():
 
     st.plotly_chart(proj_fig, use_container_width=True)
 
+    # ------------------------------------------------------------------
+    # 2b. Side-by-side comparison chart
+    # ------------------------------------------------------------------
+    st.subheader("Historical vs Projected — Side by Side Comparison")
+
+    sbs_themes = ["VWRA", "Water", "Grid Infra", "Copper", "Uranium", "Rare Earths", "Defence", "Semis"]
+    sbs_hist   = [11.0, 13.1, 15.0, 10.0, 8.0, 6.0, 12.0, 14.0]
+    sbs_low    = [9,    12,   15,   12,   14,  10,  12,   12]
+    sbs_high   = [10,   15,   18,   16,   18,  14,  15,   16]
+
+    sbs_fig = go.Figure()
+
+    sbs_fig.add_trace(go.Bar(
+        x=sbs_themes, y=sbs_hist, name="10yr Historical",
+        marker_color="rgba(180,180,180,0.85)",
+        text=[f"{v}%" for v in sbs_hist],
+        textposition="outside", textfont=dict(size=11),
+    ))
+    sbs_fig.add_trace(go.Bar(
+        x=sbs_themes, y=sbs_low, name="Projected Low (2030)",
+        marker_color="rgba(255,167,38,0.6)",
+        text=[f"{v}%" for v in sbs_low],
+        textposition="outside", textfont=dict(size=11),
+    ))
+    sbs_fig.add_trace(go.Bar(
+        x=sbs_themes, y=sbs_high, name="Projected High (2030)",
+        marker_color="rgba(255,130,0,0.95)",
+        text=[f"{v}%" for v in sbs_high],
+        textposition="outside", textfont=dict(size=11),
+    ))
+
+    sbs_fig.update_layout(
+        title="Historical vs Projected — Side by Side Comparison",
+        yaxis_title="Average annual return (%)",
+        xaxis_title="",
+        yaxis=dict(ticksuffix="%", range=[0, 23]),
+        barmode="group",
+        template="plotly_dark",
+        height=460,
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="center", x=0.5),
+    )
+
+    st.plotly_chart(sbs_fig, use_container_width=True)
+
+    st.caption(
+        "Grey = what actually happened. Orange = where institutional research points "
+        "based on committed government spending and physical demand forecasts."
+    )
+
     # Combined disclaimer
     st.caption(
         "Historical returns are verified actual data. Projected returns are based on institutional "
