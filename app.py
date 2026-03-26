@@ -130,6 +130,11 @@ def explain_watchlist(item: dict) -> str:
             "AMBER": "Defence pulled back slightly. Budget cycles cause temporary dips.",
             "RED": "Defence stocks are down. Unusual given geopolitical backdrop — worth investigating why.",
         },
+        "semiconductors": {
+            "GREEN": "Chip stocks are riding high on AI spending. Companies are pouring money into data centres.",
+            "AMBER": f"Semiconductor stocks pulled back {abs(weekly):.1f}% this week. These are volatile — AI hype swings both ways.",
+            "RED": "Chip stocks are in a correction. If AI spending holds up, this could be an entry — but it's a higher-risk theme.",
+        },
     }
 
     theme_expl = explanations.get(theme, {})
@@ -961,12 +966,24 @@ def render_growth_projections():
 
 
 def render_historical_returns():
-    """Render Historical Returns Comparison section with bar chart and government commitments."""
+    """Render Historical Returns Comparison section with bar charts, projections, theme table, and government commitments."""
     st.header("Historical Returns Comparison")
-    st.caption("How have these ETFs actually performed? Verified average annual returns by time period.")
 
-    # Verified historical average annual returns
-    etfs = ["VWRA (VT)", "Water (PHO)", "Grid (GRID)", "Copper (COPX)", "Uranium (URA)"]
+    # Plain English intro
+    st.info(
+        "This section compares what these themes have actually returned historically with what "
+        "institutional research projects they will return based on confirmed government spending, "
+        "physical demand forecasts and corporate commitments. The grey bars are what already happened. "
+        "The coloured bars are where the evidence points. Use this to build conviction — not as a guarantee."
+    )
+
+    # ------------------------------------------------------------------
+    # 1. Historical Returns bar chart
+    # ------------------------------------------------------------------
+    st.subheader("Verified Historical Returns")
+    st.caption("Actual average annual returns by ETF and time period.")
+
+    etfs = ["VWRA (VT)", "Water (PHO)", "Grid (GRID)", "Copper (COPX)", "Uranium (URA)", "Semis (SEMI)"]
     periods = ["20yr", "15yr", "10yr", "5yr"]
 
     returns_data = {
@@ -975,6 +992,7 @@ def render_historical_returns():
         "Grid (GRID)":   [None, 12.0, 15.0, 16.0],
         "Copper (COPX)": [None, 8.0,  10.0, 18.0],
         "Uranium (URA)": [None, 5.0,  8.0,  22.0],
+        "Semis (SEMI)":  [None, None, 14.0, 25.0],
     }
 
     colors = {
@@ -983,40 +1001,120 @@ def render_historical_returns():
         "Grid (GRID)":   "#ff7f0e",
         "Copper (COPX)": "#d62728",
         "Uranium (URA)": "#2ca02c",
+        "Semis (SEMI)":  "#e377c2",
     }
 
-    fig = go.Figure()
-
+    hist_fig = go.Figure()
     for etf in etfs:
         values = returns_data[etf]
-        # Replace None with 0 for charting, but we'll annotate N/A
         display_values = [v if v is not None else 0 for v in values]
         text_values = [f"{v:.1f}%" if v is not None else "n/a" for v in values]
 
-        fig.add_trace(go.Bar(
+        hist_fig.add_trace(go.Bar(
             x=periods,
             y=display_values,
             name=etf,
             marker_color=colors[etf],
             text=text_values,
             textposition="outside",
-            textfont=dict(size=11),
+            textfont=dict(size=10),
         ))
 
-    fig.update_layout(
-        title="Average Annual Returns by ETF and Time Period",
+    hist_fig.update_layout(
+        title="Historical Average Annual Returns by ETF",
         yaxis_title="Annual return (%)",
         xaxis_title="",
-        yaxis=dict(ticksuffix="%", range=[0, 28]),
+        yaxis=dict(ticksuffix="%", range=[0, 30]),
         barmode="group",
         template="plotly_dark",
         height=450,
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="center", x=0.5),
     )
 
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(hist_fig, use_container_width=True)
 
-    # Plain English summary
+    # ------------------------------------------------------------------
+    # 2. Projected Returns bar chart
+    # ------------------------------------------------------------------
+    st.subheader("Projected Returns to 2030")
+    st.caption("Based on institutional demand forecasts and committed government spending.")
+
+    proj_themes = [
+        "VWRA", "Water", "Grid Infra", "Copper", "Uranium", "Semiconductors"
+    ]
+    proj_low =  [9,  12, 15, 12, 14, 12]
+    proj_high = [10, 15, 18, 16, 18, 16]
+    proj_mid =  [(l + h) / 2 for l, h in zip(proj_low, proj_high)]
+    proj_colors = ["#1f77b4", "#17becf", "#ff7f0e", "#d62728", "#2ca02c", "#e377c2"]
+
+    proj_sources = [
+        "Vanguard Capital Markets Model",
+        "WEF / Morgan Stanley 2025",
+        "IEA 2025 / COP29 pledges",
+        "S&P Global / Goldman Sachs",
+        "WNA 2025",
+        "Bloomberg / McKinsey 2025",
+    ]
+
+    proj_fig = go.Figure()
+
+    # Low end (base of range)
+    proj_fig.add_trace(go.Bar(
+        x=proj_themes,
+        y=proj_low,
+        name="Low estimate",
+        marker_color=[c.replace(")", ",0.4)").replace("#", "rgba(") if c.startswith("rgba") else c
+                      for c in proj_colors],
+        marker=dict(color=proj_colors, opacity=0.4),
+        text=[f"{v}%" for v in proj_low],
+        textposition="inside",
+        textfont=dict(size=11, color="white"),
+    ))
+
+    # Additional bar stacked on top showing the range
+    proj_range = [h - l for l, h in zip(proj_low, proj_high)]
+    proj_fig.add_trace(go.Bar(
+        x=proj_themes,
+        y=proj_range,
+        name="High estimate",
+        marker=dict(color=proj_colors, opacity=0.8),
+        text=[f"{h}%" for h in proj_high],
+        textposition="outside",
+        textfont=dict(size=11),
+    ))
+
+    proj_fig.update_layout(
+        title="Projected Average Annual Returns to 2030 (Institutional Research)",
+        yaxis_title="Projected annual return (%)",
+        xaxis_title="",
+        yaxis=dict(ticksuffix="%", range=[0, 24]),
+        barmode="stack",
+        template="plotly_dark",
+        height=420,
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="center", x=0.5),
+    )
+
+    # Add source annotations
+    for i, (theme, source) in enumerate(zip(proj_themes, proj_sources)):
+        proj_fig.add_annotation(
+            x=theme, y=-0.5,
+            text=source,
+            showarrow=False,
+            font=dict(size=8, color="rgba(255,255,255,0.45)"),
+            yref="y",
+        )
+
+    st.plotly_chart(proj_fig, use_container_width=True)
+
+    # Combined disclaimer
+    st.caption(
+        "Historical returns are verified actual data. Projected returns are based on institutional "
+        "demand forecasts from IEA, WEF, World Bank, Goldman Sachs, Morgan Stanley, S&P Global and "
+        "WNA. Projections assume committed government spending and structural demand trends continue. "
+        "Past performance does not guarantee future results."
+    )
+
+    # Water thesis callout
     st.info(
         "Water ETFs have historically returned 13% annually over 10 years — beating the global index. "
         "With $6.7 trillion of government-committed water infrastructure spending needed by 2030 and "
@@ -1028,7 +1126,43 @@ def render_historical_returns():
     st.divider()
 
     # ------------------------------------------------------------------
-    # Government Commitments
+    # 3. Theme Comparison table
+    # ------------------------------------------------------------------
+    st.subheader("Theme Comparison")
+    st.caption("All themes side by side — sort by any column to find what matters most to you.")
+
+    comparison_data = [
+        {"Theme": "VWRA",               "10yr Hist Return": "11%",   "Projected to 2030": "9-10%",  "Risk Level": "Low",       "Key Demand Driver": "Global economic growth",                            "Position Size": "Core",      "UCITS Ticker (LSE)": "VWRA"},
+        {"Theme": "Grid Infrastructure", "10yr Hist Return": "15%",   "Projected to 2030": "15-18%", "Risk Level": "Low-Med",   "Key Demand Driver": "$600bn/yr government committed spending",            "Position Size": "Satellite", "UCITS Ticker (LSE)": "INRG"},
+        {"Theme": "Water",               "10yr Hist Return": "13.1%", "Projected to 2030": "12-15%", "Risk Level": "Low-Med",   "Key Demand Driver": "$6.7 trillion gap + AI data centre demand",          "Position Size": "Satellite", "UCITS Ticker (LSE)": "IQQQ"},
+        {"Theme": "Copper",              "10yr Hist Return": "10%",   "Projected to 2030": "12-16%", "Risk Level": "High",      "Key Demand Driver": "50% demand increase by 2040, supply deficit",        "Position Size": "Satellite", "UCITS Ticker (LSE)": "COPA"},
+        {"Theme": "Uranium",             "10yr Hist Return": "8%",    "Projected to 2030": "14-18%", "Risk Level": "Very High", "Key Demand Driver": "Nuclear capacity doubling by 2040",                  "Position Size": "Small",     "UCITS Ticker (LSE)": "URAN"},
+        {"Theme": "Rare Earths",         "10yr Hist Return": "6%",    "Projected to 2030": "10-14%", "Risk Level": "Very High", "Key Demand Driver": "China export controls, Western supply urgency",      "Position Size": "Small",     "UCITS Ticker (LSE)": "REMX"},
+        {"Theme": "Defence",             "10yr Hist Return": "12%",   "Projected to 2030": "12-15%", "Risk Level": "Medium",    "Key Demand Driver": "NATO 2% GDP commitment, EU ReArm \u20ac800bn",       "Position Size": "Small",     "UCITS Ticker (LSE)": "NATO"},
+        {"Theme": "Semiconductors",      "10yr Hist Return": "14%",   "Projected to 2030": "12-16%", "Risk Level": "High",      "Key Demand Driver": "AI capex $300bn+ annually, chip monopolies",         "Position Size": "Small",     "UCITS Ticker (LSE)": "SEMI"},
+    ]
+
+    df_comp = pd.DataFrame(comparison_data)
+
+    # Color-code risk levels
+    def _risk_color(risk: str) -> str:
+        return {"Low": "#00c853", "Low-Med": "#69f0ae", "Medium": "#ffa000",
+                "High": "#ff6d00", "Very High": "#d50000"}.get(risk, "#999")
+
+    st.dataframe(
+        df_comp,
+        use_container_width=True,
+        hide_index=True,
+        column_config={
+            "Theme": st.column_config.TextColumn(width="medium"),
+            "Key Demand Driver": st.column_config.TextColumn(width="large"),
+        },
+    )
+
+    st.divider()
+
+    # ------------------------------------------------------------------
+    # 4. Government & Institutional Commitments
     # ------------------------------------------------------------------
     st.subheader("Government & Institutional Commitments")
     st.caption("Money that's already been committed or legislated — not promises, but budgets and contracts.")
@@ -1036,32 +1170,32 @@ def render_historical_returns():
     commitments = [
         {
             "commitment": "$6.7 trillion needed for water infrastructure by 2030",
-            "source": "World Bank & OECD — Infrastructure Outlook 2024",
+            "source": "World Bank & OECD \u2014 Infrastructure Outlook 2024",
             "color": "#17becf",
         },
         {
             "commitment": "$30 billion water pipeline programme by 2030",
-            "source": "Kingdom of Saudi Arabia — National Water Strategy 2030",
+            "source": "Kingdom of Saudi Arabia \u2014 National Water Strategy 2030",
             "color": "#17becf",
         },
         {
             "commitment": "\u00a3600 million innovation fund for water sector to 2030",
-            "source": "UK Ofwat — Water Innovation Strategy 2024",
+            "source": "UK Ofwat \u2014 Water Innovation Strategy 2024",
             "color": "#17becf",
         },
         {
             "commitment": "\u20ac584 billion grid and water investment this decade",
-            "source": "European Commission — REPowerEU & Critical Raw Materials Act 2024",
+            "source": "European Commission \u2014 REPowerEU & Critical Raw Materials Act 2024",
             "color": "#ff7f0e",
         },
         {
-            "commitment": "$15 billion climate-resilient water investments 2026-2030",
-            "source": "Global Water Partnership — Climate Resilience Programme",
+            "commitment": "$15 billion climate-resilient water investments 2026\u20132030",
+            "source": "Global Water Partnership \u2014 Climate Resilience Programme",
             "color": "#17becf",
         },
         {
             "commitment": "96% of institutional water investors increasing spending in 2025",
-            "source": "Global Water Intelligence — Annual Survey 2024",
+            "source": "Global Water Intelligence \u2014 Annual Survey 2024",
             "color": "#2ca02c",
         },
     ]

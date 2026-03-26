@@ -87,6 +87,13 @@ WATCHLIST = {
         "name": "Invesco Aerospace & Defense ETF",
         "theme": "defence",
     },
+    "SEMI.L": {
+        "name": "iShares Semiconductor UCITS ETF",
+        "theme": "semiconductors",
+        "notes": "AI chip infrastructure play. Covers semiconductor equipment and materials companies "
+                 "including ASML, TSMC, and the supply chain that makes AI chips possible. Higher risk "
+                 "and valuation than infrastructure themes — smaller position appropriate. Ireland domiciled UCITS ETF.",
+    },
 }
 
 # --- Macro Indicators ---
@@ -135,6 +142,13 @@ THRESHOLDS = {
         "condition": "below",
         "value": 75,
         "signal": "Discount to contract prices",
+    },
+    "semi_drawdown": {
+        "ticker": "SEMI.L",
+        "condition": "below",
+        "value": None,  # Set dynamically as 85% of current price (15% drawdown)
+        "pct_drop": 15,
+        "signal": "Semiconductor ETF 15% drawdown — potential entry signal",
     },
 }
 
