@@ -1393,6 +1393,65 @@ def render_historical_returns():
     )
 
 
+def render_buy_guide(signals: dict):
+    """Render Quick Reference Buy Guide with live signals."""
+    st.header("Quick Reference Buy Guide")
+
+    st.info(
+        "All ETFs are UCITS compliant and Ireland-domiciled — suitable for non-US investors including "
+        "UAE-structured companies. Avoids US withholding tax and estate tax. All available on Interactive "
+        "Brokers (IBKR). Search using the .L suffix for London Stock Exchange listings."
+    )
+
+    # Build a ticker-to-signal lookup from live data
+    live_signals = {}
+    for item in signals.get("portfolio", []):
+        live_signals[item.get("ticker", "")] = item.get("signal", "AMBER")
+    for item in signals.get("watchlist", []):
+        live_signals[item.get("ticker", "")] = item.get("signal", "AMBER")
+
+    guide_data = [
+        {"Theme": "Global Equities",     "ETF Name": "Vanguard FTSE All-World UCITS",     "IBKR Ticker": "VWRA.L", "Why You Own It": "Foundation — global economy in one ETF",                                                    "Position Size": "Core"},
+        {"Theme": "Semiconductors",       "ETF Name": "iShares Semiconductor UCITS",       "IBKR Ticker": "SEMI.L", "Why You Own It": "The chips that power everything — ASML, TSMC, Nvidia in one ETF",                            "Position Size": "Small"},
+        {"Theme": "Grid Infrastructure",  "ETF Name": "iShares Global Clean Energy UCITS", "IBKR Ticker": "INRG.L", "Why You Own It": "Governments committed $600bn/yr — every AI data centre needs grid connection first",          "Position Size": "Satellite"},
+        {"Theme": "Water",                "ETF Name": "iShares Global Water UCITS",        "IBKR Ticker": "IQQQ.L", "Why You Own It": "$6.7 trillion gap by 2030 — AI data centres consume as much water as entire US population",   "Position Size": "Satellite"},
+        {"Theme": "Copper Physical",      "ETF Name": "WisdomTree Copper ETC",             "IBKR Ticker": "COPA.L", "Why You Own It": "Every EV, wind turbine and data centre needs copper — supply deficit confirmed",              "Position Size": "Satellite"},
+        {"Theme": "Uranium",              "ETF Name": "Global X Uranium UCITS",            "IBKR Ticker": "URAN.L", "Why You Own It": "Nuclear capacity doubling by 2040 — 20 countries committed at COP28",                        "Position Size": "Small"},
+        {"Theme": "Cybersecurity",        "ETF Name": "iShares Digital Security UCITS",    "IBKR Ticker": "LOCK.L", "Why You Own It": "$248bn market growing to $700bn by 2034 — AI fraud driving unlimited demand",                "Position Size": "Small"},
+        {"Theme": "Defence",              "ETF Name": "HANetf Future of Defence UCITS",    "IBKR Ticker": "NATO.L", "Why You Own It": "All 32 NATO members legally committed to 2% GDP — EU ReArm \u20ac800bn",                     "Position Size": "Small"},
+        {"Theme": "Rare Earths",          "ETF Name": "VanEck Rare Earth UCITS",           "IBKR Ticker": "REMX.L", "Why You Own It": "China controls 90% of refining — Western governments paying any price for alternatives",      "Position Size": "Small"},
+    ]
+
+    # Map IBKR tickers to watchlist/portfolio tickers for signal lookup
+    ticker_map = {
+        "VWRA.L": "VWRA.L",
+        "SEMI.L": "SEMI.L",
+        "INRG.L": "GRID",       # GRID is the US-listed proxy tracked in watchlist
+        "IQQQ.L": "PHO",        # PHO is the US-listed proxy tracked in watchlist
+        "COPA.L": "COPX",       # COPX is the US-listed proxy tracked in watchlist
+        "URAN.L": "URA",        # URA is the US-listed proxy tracked in watchlist
+        "LOCK.L": "LOCK.L",
+        "NATO.L": "ITA",        # ITA is the US-listed proxy tracked in watchlist
+        "REMX.L": "REMX",
+    }
+
+    for row in guide_data:
+        proxy_ticker = ticker_map.get(row["IBKR Ticker"], "")
+        sig = live_signals.get(proxy_ticker, "AMBER")
+        row["Current Signal"] = sig
+
+    df_guide = pd.DataFrame(guide_data)
+
+    st.dataframe(
+        df_guide,
+        use_container_width=True,
+        hide_index=True,
+        column_config={
+            "Why You Own It": st.column_config.TextColumn(width="large"),
+        },
+    )
+
+
 @st.cache_data(ttl=3600)
 def load_all_data():
     """Load all data sources with caching."""
@@ -1690,6 +1749,10 @@ def main():
 
     # Historical Returns & Government Commitments
     render_historical_returns()
+    st.divider()
+
+    # Quick Reference Buy Guide
+    render_buy_guide(signals)
     st.divider()
 
     render_watchlist(signals)
