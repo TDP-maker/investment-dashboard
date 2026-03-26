@@ -9,7 +9,7 @@ import streamlit as st
 import pandas as pd
 from datetime import datetime
 
-from config import PORTFOLIO, WATCHLIST, THRESHOLDS
+from config import PORTFOLIO, WATCHLIST, THRESHOLDS, DASHBOARD_PASSWORD
 from data_fetchers import fetch_portfolio_data, fetch_watchlist_data, fetch_macro_data
 from data_fetchers import fetch_fred_data, fetch_cot_data, fetch_scraped_data
 from analysis.signals import classify_signals
@@ -221,7 +221,32 @@ def render_briefing(briefing_text: str):
         st.info("No briefing generated yet. Click 'Generate Briefing' to create one.")
 
 
+def check_password() -> bool:
+    """Prompt for password if DASHBOARD_PASSWORD is set. Returns True if access is granted."""
+    if not DASHBOARD_PASSWORD:
+        return True
+
+    if st.session_state.get("authenticated"):
+        return True
+
+    st.title("Investment Intelligence Dashboard")
+    st.markdown("---")
+    password = st.text_input("Enter password to access the dashboard:", type="password")
+
+    if password:
+        if password == DASHBOARD_PASSWORD:
+            st.session_state["authenticated"] = True
+            st.rerun()
+        else:
+            st.error("Incorrect password.")
+
+    st.stop()
+
+
 def main():
+    if not check_password():
+        return
+
     st.title("Investment Intelligence Dashboard")
     st.caption("Long-term positioning signals — not a trading tool")
 

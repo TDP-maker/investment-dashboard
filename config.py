@@ -12,6 +12,9 @@ load_dotenv()
 FRED_API_KEY = os.getenv("FRED_API_KEY")
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")
 
+# Dashboard password (optional — if unset, no login required)
+DASHBOARD_PASSWORD = os.getenv("DASHBOARD_PASSWORD")
+
 # SMTP config
 SMTP_HOST = os.getenv("SMTP_HOST", "smtp.gmail.com")
 SMTP_PORT = int(os.getenv("SMTP_PORT", "587"))
