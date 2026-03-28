@@ -8,12 +8,22 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+
+def _get_secret(key: str, default=None):
+    """Read a secret from Streamlit secrets first, then fall back to env vars."""
+    try:
+        import streamlit as st
+        return st.secrets[key]
+    except (ImportError, KeyError, FileNotFoundError):
+        return os.getenv(key, default)
+
+
 # API Keys
-FRED_API_KEY = os.getenv("FRED_API_KEY")
-ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")
+FRED_API_KEY = _get_secret("FRED_API_KEY")
+ANTHROPIC_API_KEY = _get_secret("ANTHROPIC_API_KEY")
 
 # Dashboard password (optional — if unset, no login required)
-DASHBOARD_PASSWORD = os.getenv("DASHBOARD_PASSWORD")
+DASHBOARD_PASSWORD = _get_secret("DASHBOARD_PASSWORD")
 
 # SMTP config
 SMTP_HOST = os.getenv("SMTP_HOST", "smtp.gmail.com")

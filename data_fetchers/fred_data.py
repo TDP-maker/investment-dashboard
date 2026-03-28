@@ -16,11 +16,20 @@ def _fetch_fred_series(series_id: str, name: str) -> dict:
 
     try:
         from fredapi import Fred
+    except ImportError:
+        return {"series_id": series_id, "name": name, "error": "fredapi package not installed — run: pip install fredapi"}
+
+    try:
         fred = Fred(api_key=FRED_API_KEY)
         data = fred.get_series(series_id, observation_start=datetime.now() - timedelta(days=365))
 
-        if data.empty:
+        if data is None or data.empty:
             return {"series_id": series_id, "name": name, "error": "No data available"}
+
+        # Drop NaN values that FRED sometimes returns
+        data = data.dropna()
+        if data.empty:
+            return {"series_id": series_id, "name": name, "error": "No data available after filtering"}
 
         current = data.iloc[-1]
         prev = data.iloc[-2] if len(data) > 1 else current
@@ -39,16 +48,25 @@ def _fetch_fred_series(series_id: str, name: str) -> dict:
             "low_1y": round(float(data.min()), 4),
             "last_updated": datetime.now().isoformat(),
         }
+    except ValueError as e:
+        return {"series_id": series_id, "name": name, "error": f"Invalid API key or bad response: {e}"}
     except Exception as e:
-        return {"series_id": series_id, "name": name, "error": str(e)}
+        return {"series_id": series_id, "name": name, "error": f"Could not load data: {e}"}
 
 
 def fetch_fred_data() -> list[dict]:
-    """Fetch all configured FRED series."""
+    """Fetch all configured FRED series. Always returns a list, never crashes."""
     def _fetch():
         results = []
         for series_id, name in FRED_SERIES.items():
-            results.append(_fetch_fred_series(series_id, name))
+            try:
+                results.append(_fetch_fred_series(series_id, name))
+            except Exception as e:
+                results.append({"series_id": series_id, "name": name, "error": f"Unexpected error: {e}"})
         return results
 
-    return cached_fetch("fred_data", _fetch)
+    try:
+        return cached_fetch("fred_data", _fetch)
+    except Exception:
+        return [{"series_id": sid, "name": name, "error": "FRED data temporarily unavailable"}
+                for sid, name in FRED_SERIES.items()]
