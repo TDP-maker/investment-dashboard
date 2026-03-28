@@ -85,6 +85,21 @@ def _classify_fred_signal(data: dict) -> str:
             return "AMBER"
         return "GREEN"
 
+    # 10-Year Treasury rate
+    if "DGS10" in series_id:
+        if current > 5:
+            return "RED"
+        elif current > 4.5:
+            return "AMBER"
+        return "GREEN"
+
+    # Dollar index
+    if "DTWEXBGS" in series_id:
+        monthly = data.get("monthly_change", 0)
+        if monthly > 3:
+            return "AMBER"
+        return "GREEN"
+
     return "GREEN"
 
 

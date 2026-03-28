@@ -265,15 +265,29 @@ def explain_fred(item: dict) -> str:
     if "DGS10" in series_id:
         if value > 5:
             return (f"10-year Treasury rate at {value:.2f}% — very high. This makes mortgages and business loans expensive. "
-                    "Stocks compete with 'risk-free' 5%+ returns from bonds.")
+                    "Stocks compete with 'risk-free' 5%+ returns from bonds. Rate pressure is real.")
+        elif value > 4.5:
+            return (f"10-year rate at {value:.2f}% — elevated. Bonds are offering solid returns which pulls money "
+                    "away from stocks. This creates headwinds for equity valuations, especially growth stocks.")
         elif value > 4:
-            return (f"10-year rate at {value:.2f}% — elevated but not extreme. Bonds are offering decent returns, "
-                    "which creates some competition for stocks.")
+            return (f"10-year rate at {value:.2f}% — moderately high. Some competition from bonds but not extreme. "
+                    "Stocks can still do well at these levels.")
         else:
             return f"10-year rate at {value:.2f}% — moderate. Not a major headwind for stocks."
 
     if "DTWEXBGS" in series_id:
-        return f"Trade-weighted dollar index at {value:.1f}. This tracks the dollar against a basket of currencies."
+        monthly = item.get("monthly_change", 0)
+        if monthly > 3:
+            return (f"Dollar index at {value:.1f} and rising ({monthly:+.1f} this month). "
+                    "A strengthening dollar puts pressure on international assets and commodities. "
+                    "Not great for non-US investors — makes everything priced in dollars more expensive.")
+        elif monthly < -2:
+            return (f"Dollar index at {value:.1f} and falling ({monthly:+.1f} this month). "
+                    "A weakening dollar is good for international assets and commodities. "
+                    "Tailwind for our positions.")
+        else:
+            return (f"Dollar index at {value:.1f} — stable this month. "
+                    "No major currency headwinds for our positions right now.")
 
     return f"Currently at {value}."
 
