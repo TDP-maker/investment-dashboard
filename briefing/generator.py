@@ -111,7 +111,6 @@ def generate_briefing(
                 portfolio_data=_format_data_section(portfolio_data),
                 watchlist_data=_format_data_section(watchlist_data),
                 macro_data=_format_data_section(macro_data),
-                fred_data=_format_data_section(fred_data),
                 cot_data=_format_data_section(cot_data),
                 scraped_data=_format_data_section(scraped_data),
                 alerts_data=_format_data_section(alerts),

@@ -21,7 +21,6 @@ def _get_secret(key: str, default=None):
 
 
 # API Keys
-FRED_API_KEY = _get_secret("FRED_API_KEY")
 ANTHROPIC_API_KEY = _get_secret("ANTHROPIC_API_KEY")
 
 # Dashboard password (optional — if unset, no login required)
@@ -160,14 +159,6 @@ MACRO_TICKERS = {
     "CL=F": "Crude Oil Futures (WTI)",
 }
 
-# FRED series IDs for macro data
-FRED_SERIES = {
-    "BAMLH0A0HYM2": "ICE BofA US High Yield OAS (Credit Spreads)",
-    "T10Y2Y": "10Y-2Y Treasury Spread",
-    "DGS10": "10-Year Treasury Rate",
-    "DTWEXBGS": "Trade Weighted US Dollar Index",
-}
-
 # --- Alert Thresholds ---
 THRESHOLDS = {
     "vwra_support": {
@@ -187,12 +178,6 @@ THRESHOLDS = {
         "condition": "below",
         "value": 90,
         "signal": "De-escalation signal",
-    },
-    "credit_stress": {
-        "series": "BAMLH0A0HYM2",
-        "condition": "above",
-        "value": 500,
-        "signal": "Credit stress — equities follow lower",
     },
     "uranium_discount": {
         "source": "scraper",
@@ -287,9 +272,6 @@ BRIEFING_USER_PROMPT_TEMPLATE = """Here is this week's market data. Please produ
 
 ## Macro Indicators
 {macro_data}
-
-## FRED Economic Data
-{fred_data}
 
 ## COT Data (Commitments of Traders)
 {cot_data}
