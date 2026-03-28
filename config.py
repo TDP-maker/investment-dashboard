@@ -13,9 +13,11 @@ def _get_secret(key: str, default=None):
     """Read a secret from Streamlit secrets first, then fall back to env vars."""
     try:
         import streamlit as st
-        return st.secrets[key]
-    except (ImportError, KeyError, FileNotFoundError):
-        return os.getenv(key, default)
+        if hasattr(st, "secrets") and key in st.secrets:
+            return st.secrets[key]
+    except Exception:
+        pass
+    return os.getenv(key, default)
 
 
 # API Keys

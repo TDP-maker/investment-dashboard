@@ -54,7 +54,7 @@ def _fetch_fred_series(series_id: str, name: str) -> dict:
         return {"series_id": series_id, "name": name, "error": f"Could not load data: {e}"}
 
 
-def fetch_fred_data() -> list[dict]:
+def fetch_fred_data() -> list:
     """Fetch all configured FRED series. Always returns a list, never crashes."""
     def _fetch():
         results = []

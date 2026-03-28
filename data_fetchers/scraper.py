@@ -62,7 +62,7 @@ def _scrape_baltic_dry_index() -> dict:
         return {"name": "Baltic Dry Index", "error": str(e)}
 
 
-def _scrape_congressional_trades() -> list[dict]:
+def _scrape_congressional_trades() -> list:
     """Scrape recent congressional stock trades from public sources."""
     try:
         url = "https://www.capitoltrades.com/trades?pageSize=20"

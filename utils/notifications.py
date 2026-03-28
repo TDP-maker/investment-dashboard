@@ -43,7 +43,7 @@ def send_email_alert(subject: str, body: str, html: bool = False) -> bool:
         return False
 
 
-def format_alerts_email(alerts: list) -> tuple[str, str]:
+def format_alerts_email(alerts: list) -> tuple:
     """Format alerts into an email subject and body."""
     if not alerts:
         return "No alerts", "No threshold alerts triggered."

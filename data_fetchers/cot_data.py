@@ -17,7 +17,7 @@ COT_COMBINED_URL = "https://www.cftc.gov/dea/newcot/f_disagg.txt"
 COT_HISTORICAL_URL = "https://www.cftc.gov/files/dea/history/deacot{year}.zip"
 
 
-def _parse_cot_report(text: str, commodity_filter: str) -> list[dict]:
+def _parse_cot_report(text: str, commodity_filter: str) -> list:
     """Parse COT report text for a specific commodity."""
     results = []
     lines = text.strip().split("\n")
@@ -45,7 +45,7 @@ def _parse_cot_report(text: str, commodity_filter: str) -> list[dict]:
     return results
 
 
-def _calculate_net_positions(records: list[dict]) -> list[dict]:
+def _calculate_net_positions(records: list) -> list:
     """Calculate net commercial and speculative positions."""
     for record in records:
         record["commercial_net"] = record["commercial_long"] - record["commercial_short"]
@@ -53,7 +53,7 @@ def _calculate_net_positions(records: list[dict]) -> list[dict]:
     return records
 
 
-def _check_consecutive_net_long(records: list[dict], weeks: int) -> bool:
+def _check_consecutive_net_long(records: list, weeks: int) -> bool:
     """Check if commercials have been net long for N consecutive weeks."""
     if len(records) < weeks:
         return False

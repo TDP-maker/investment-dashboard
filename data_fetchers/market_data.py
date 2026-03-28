@@ -42,7 +42,7 @@ def _fetch_ticker_data(ticker: str, period: str = "6mo") -> dict:
         return {"ticker": ticker, "error": str(e)}
 
 
-def fetch_portfolio_data() -> list[dict]:
+def fetch_portfolio_data() -> list:
     """Fetch current data for all portfolio positions."""
     def _fetch():
         results = []
@@ -57,7 +57,7 @@ def fetch_portfolio_data() -> list[dict]:
     return cached_fetch("portfolio_data", _fetch)
 
 
-def fetch_watchlist_data() -> list[dict]:
+def fetch_watchlist_data() -> list:
     """Fetch current data for all watchlist tickers."""
     def _fetch():
         results = []
@@ -71,7 +71,7 @@ def fetch_watchlist_data() -> list[dict]:
     return cached_fetch("watchlist_data", _fetch)
 
 
-def fetch_macro_data() -> list[dict]:
+def fetch_macro_data() -> list:
     """Fetch macro indicator data."""
     def _fetch():
         results = []

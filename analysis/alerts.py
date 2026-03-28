@@ -13,7 +13,7 @@ def check_alerts(
     fred_data: list,
     cot_data: dict,
     scraped_data: dict,
-) -> list[dict]:
+) -> list:
     """Check all thresholds and return triggered alerts."""
     alerts = []
 
