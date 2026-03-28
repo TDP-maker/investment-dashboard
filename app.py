@@ -19,6 +19,7 @@ from analysis.signals import classify_signals
 from analysis.alerts import check_alerts
 from briefing.generator import generate_briefing
 from utils.cache import clear_cache
+from warning_system import render_economic_warning_system
 
 # Page config
 st.set_page_config(
@@ -2229,6 +2230,10 @@ def main():
 
     # Portfolio Map — first visible section
     render_portfolio_map()
+    st.divider()
+
+    # Economic Warning System
+    render_economic_warning_system()
     st.divider()
 
     # Render sections
